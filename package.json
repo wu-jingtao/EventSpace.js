@@ -1,0 +1,19 @@
+{
+  "name": "datacast",
+  "version": "0.0.1",
+  "description": "a data layer framework",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mx601595686/Datacast.js.git"
+  },
+  "keywords": [
+    "datacast"
+  ],
+  "author": "wujingtao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mx601595686/Datacast.js/issues"
+  },
+  "homepage": "https://github.com/mx601595686/Datacast.js#readme"
+}
