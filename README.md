@@ -57,11 +57,11 @@ requestCache方法接受两个参数。第一个是缓存中保存的对应地�
 例如：
 
 ```javascript
-eceive('test',data=>{
+receive('test',data=>{
    console.log(data);
 });
 
-eceive('test2',data=>{
+receive('test2',data=>{
    console.log(data);
 });
 
