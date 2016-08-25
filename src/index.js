@@ -3,10 +3,10 @@
  */
 
 
-const {on,off,send,dispatchList}  = require('./DispatchCenter');
+const {receive,cancel,send,dispatchList}  = require('./DispatchCenter');
 const {cacheData,cache,requestCache}  = require('./Cache');
 
 module.exports = {
-    on,off,send,cache,requestCache,
+    receive,cancel,send,cache,requestCache,
     innerData:{cacheData,dispatchList}
 };

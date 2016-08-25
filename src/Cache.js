@@ -19,20 +19,20 @@ const cacheData = {};
  * @return {undefined}
  */
 function cache(address, onReceive, onRequest) {
-    DispatchCenter.on('__cache__receive.' + address,data => {     //注册数据接收器
+    DispatchCenter.receive('__cache__receive.' + address,data => {     //注册数据接收器
         if(onReceive)
             data = onReceive(data,cacheData[address]);
         cacheData[address] = data;
     });
 
-    DispatchCenter.on('__cache__request.'+ address, callback_address => {     //注册请求接受器
+    DispatchCenter.receive('__cache__request.'+ address, callback_address => {     //注册请求接受器
 
         let data = cacheData[address];
 
         if(onRequest)
             data = onRequest(data);
 
-        DispatchCenter.send(callback_address,data);
+        DispatchCenter.send(callback_address,data,false);
     });
 }
 
@@ -42,7 +42,7 @@ function cache(address, onReceive, onRequest) {
  * @param {string} callback_address 回传数据的传输路径
  */
 function requestCache(address,callback_address) {
-    DispatchCenter.send('__cache__request.' + address,callback_address);
+    DispatchCenter.send('__cache__request.' + address,callback_address,false);
 }
 
 module.exports = {
