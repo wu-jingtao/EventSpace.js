@@ -11,6 +11,7 @@ receive('test',data=>{
 cache('test');
 
 send('test','123');
+send('test.2','321');
 
 requestCache('test','test');
 
