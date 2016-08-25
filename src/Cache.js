@@ -25,7 +25,7 @@ function cache(address, onReceive, onRequest) {
         cacheData[address] = data;
     });
 
-    DispatchCenter.on('__cache__request.'+ address,callback_address => {     //注册请求接受器
+    DispatchCenter.on('__cache__request.'+ address, callback_address => {     //注册请求接受器
 
         let data = cacheData[address];
 

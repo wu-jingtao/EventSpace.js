@@ -70,11 +70,22 @@ function off(address) {
         if (index === address_level.length - 1) {
             currentLevel.receiver.clear();
             currentLevel.children.clear();
-            return true;  //跳出循环
         }
 
-        level = currentLevel;
+        level = currentLevel.children;
     });
+}
+
+
+//辅助方法，用于获取子级所有的接收器方法
+function getAllChildrenReceiver(targetLevel) { 
+    const receiver = [...targetLevel.receiver];
+
+    for(let item of targetLevel.children.values()){
+        receiver.push(...getAllChildrenReceiver(item));
+    }
+        
+    return receiver;
 }
 
 /**
@@ -88,7 +99,7 @@ function send(address, data) {
 
     let level = dispatchList.children;
 
-    const receiver = [];
+    let targetLevel = null;
 
     address_level.some((item, index) => { //循环每一个层级
 
@@ -96,20 +107,24 @@ function send(address, data) {
 
         if (currentLevel == null) return true;  //跳出循环
 
-        receiver.push(...currentLevel.receiver);
+        if (index === address_level.length - 1)
+            targetLevel = currentLevel; //获取目标层级
 
         level = currentLevel.children;
     });
 
-    receiver.forEach(item => item(data, address));
+    if(targetLevel){
+        const receiver = getAllChildrenReceiver(targetLevel);
+        receiver.forEach(item => item(data, address));
+    }
 }
-
 
 
 exports.on = on;
 exports.off = off;
 exports.send = function (address, data) {
     send(address, data);
-    send('__cache__receive.' + address, data);  //給缓存再发一份
+    if(address.indexOf('__cache__request.') !== 0)  //确保不是请求缓存数据
+        send('__cache__receive.' + address, data);  //給缓存再发一份
 };
 exports.dispatchList = dispatchList;
