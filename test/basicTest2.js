@@ -2,7 +2,8 @@
  * Created by wujingtao on 2016/8/24 0024.
  */
 
-/*测试 off*/
+/*测试 cancel*/
+/*父级可以删除自己和所有子级*/
 
 const {receive,send,cancel} = require('../src/index');
 

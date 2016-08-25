@@ -23,8 +23,9 @@ requestCache('test','test');
 /*
 * output:
 * 
-* 123
-* 123 undefined
-* 321
-* 666
+ 123
+ 123 undefined
+ 321
+ 666
+ 666 321    //会出现这个结果是因为又给自己发了一份（可能不算是个bug）
 * */

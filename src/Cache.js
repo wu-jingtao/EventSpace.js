@@ -7,10 +7,9 @@ const DispatchCenter = require('./DispatchCenter');
 /*数据缓存模块*/
 
 /**
- * 保存缓存到的数据,和两个回调方法
+ * 保存缓存到的数据,和onRequest回调方法
  */
 const cacheData = {};
-
 
 /**
  * 缓存指定路径上的数据
@@ -20,11 +19,16 @@ const cacheData = {};
  * @return {undefined}
  */
 function cache(address, onReceive, onRequest) {
-    if (!address in cacheData) {  //确保不会重复注册
-        cacheData[address] = {data: undefined, onReceive, onRequest};
+    if (!(address in cacheData)) {  //确保不会重复注册
+        cacheData[address] = {data: undefined, onRequest};
+        DispatchCenter.receive('__cache__receive.' + address,data => {
+            if(onReceive)
+                data = onReceive(data,cacheData[address].data);
+
+            cacheData[address].data = data;
+        });
     }
 }
-
 
 /**
  * 请求cache中的数据
@@ -43,23 +47,9 @@ function requestCache(address, callback_address = '') {
     DispatchCenter.send(callback_address, result);
 }
 
-/**
- * 设置缓存中的数据，这个只对内部使用
- * @param {string} address 数据传输的路径
- * @param data 要保存的数据
- */
-function receiveCache(address, data) {
-    if (address in cacheData) {
-        if (cacheData[address].onReceive)
-            data = cacheData[address].onReceive(data, cacheData[address].data);
-
-        cacheData[address].data = data;
-    }
-}
 
 module.exports = {
     cacheData,
     cache,
-    requestCache,
-    receiveCache
+    requestCache
 };

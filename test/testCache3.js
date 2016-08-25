@@ -16,3 +16,10 @@ send('test.2',321);
 
 
 requestCache('test','test2');
+
+/*
+* output：
+*
+* 123
+* 123
+* */

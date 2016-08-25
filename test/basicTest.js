@@ -2,7 +2,8 @@
  * Created by wujingtao on 2016/8/24 0024.
  */
 
-/*测试 on 和 send*/
+/*测试 receive 和 send*/
+/*父级可以向所有子级发送数据*/
 
 const {receive,send} = require('../src/index');
 
