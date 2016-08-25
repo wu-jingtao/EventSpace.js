@@ -2,6 +2,8 @@
  * Created by wujingtao on 2016/8/24 0024.
  */
 
+var Cache = require('./Cache');
+
 /*数据分发中心*/
 
 /**
@@ -26,13 +28,13 @@ const dispatchList = new DispatchLevel('root');
  * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，address:接收到的地址字符串）
  * @return {function} 返回 receiver
  */
-function receive(address='', receiver) {
+function receive(address = '', receiver) {
 
     if (typeof receiver !== 'function')  /*验证数据类型*/
         throw new Error('receiver is not a function');
 
     address = address.split('.');   //分割地址的命名空间
-    
+
     let level = dispatchList.children;
 
     address.forEach((item, index) => {  //循环每一级命名空间,找到对应的层级
@@ -57,12 +59,12 @@ function receive(address='', receiver) {
  * @param {string} address 接收地址.(字符串通过‘.’来分割层级)
  * @return {undefined}
  */
-function cancel(address='') {
+function cancel(address = '') {
 
     let level = dispatchList.children;
-    
+
     address = address.split('.');   //分割地址的命名空间
-    
+
     address.some((item, index) => {
         const currentLevel = level.get(item);
 
@@ -78,13 +80,13 @@ function cancel(address='') {
 }
 
 //辅助方法，用于获取子级所有的接收器方法
-function getAllChildrenReceiver(targetLevel) { 
+function getAllChildrenReceiver(targetLevel) {
     const receiver = [...targetLevel.receiver];
 
-    for(let item of targetLevel.children.values()){
+    for (let item of targetLevel.children.values()) {
         receiver.push(...getAllChildrenReceiver(item));
     }
-        
+
     return receiver;
 }
 
@@ -94,12 +96,12 @@ function getAllChildrenReceiver(targetLevel) {
  * @param data 要发送的数据
  * @return {undefined}
  */
-function send(address,data) {
+function send(address, data) {
 
     let level = dispatchList.children;
 
     const addressLevel = address.split('.');   //分割地址的命名空间
-    
+
     let targetLevel = null;
 
     addressLevel.some((item, index) => { //循环每一个层级
@@ -114,24 +116,14 @@ function send(address,data) {
         level = currentLevel.children;
     });
 
-    if(targetLevel){
+    if (targetLevel) {
         const receiver = getAllChildrenReceiver(targetLevel);
         receiver.forEach(item => item(data, address));
     }
+
+    Cache.receiveCache(address, data);  //将数据保存到缓存
 }
 
-module.exports = {receive,cancel,dispatchList,
+module.exports = {receive, cancel, dispatchList, send};
 
-    /**
-     * send的包装方法
-     * @param address
-     * @param data
-     * @param needSendToCache   是否需要将这个数据发送给Cache
-     */
-    send(address,data,needSendToCache = true){
-        send(address, data);
-        if(needSendToCache)
-            send('__cache__receive.' + address, data);  //給缓存再发一份
-    }
-};
 
