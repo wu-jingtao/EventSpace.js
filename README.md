@@ -1,5 +1,5 @@
 # Datacast.js
-[English](blob/master/README.en.md)
+[English](README.en.md)
 
 因为对`flux、redux、baobab`都不太满意，所以写了这个框架。
 

@@ -44,7 +44,6 @@ send('test.2.3','c');
 ```
 
 ###by the cache to hold the last sent data
-# # # by the cache to hold the last sent data
 
 
 Event listeners a model is that the listener can't actively request data to the sender, if the sender not send again
@@ -87,8 +86,7 @@ requestCache('test','test2');
 * 123
 * */
 ```
-####持久化缓存数据
-The persistent cache data
+####The persistent cache data
 
 
 The cache method besides can cache the data on the corresponding address string can also through this (onReceive, onRequest)
