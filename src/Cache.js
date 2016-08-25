@@ -21,9 +21,9 @@ const cacheData = {};
 function cache(address, onReceive, onRequest) {
     if (!(address in cacheData)) {  //确保不会重复注册
         cacheData[address] = {data: undefined, onRequest};
-        DispatchCenter.receive('__cache__receive.' + address,data => {
-            if(onReceive)
-                data = onReceive(data,cacheData[address].data);
+        DispatchCenter.receive('__cache__receive.' + address, data => {
+            if (onReceive)
+                data = onReceive(data, cacheData[address].data);
 
             cacheData[address].data = data;
         });
@@ -44,7 +44,7 @@ function requestCache(address, callback_address = '') {
             result = cacheData[address].onRequest(result);
     }
 
-    DispatchCenter.send(callback_address, result);
+    DispatchCenter.send(callback_address, result, false);
 }
 
 

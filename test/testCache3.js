@@ -2,6 +2,7 @@
  * Created by HASEE on 2016/8/25.
  */
 
+/*requestCache只会返回精确地址字符串所对应的数据，子级不会返回*/
 
 const {receive,send,cache,requestCache} = require('../src/index');
 
