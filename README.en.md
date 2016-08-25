@@ -1,5 +1,6 @@
 # Datacast.js
 
+[中文](README.md)
 ######Translated by youdao
 
 Because of ` flux, redux, baobab ` are not satisfied with, so I write this framework.
