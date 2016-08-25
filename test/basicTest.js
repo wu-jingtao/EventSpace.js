@@ -2,9 +2,9 @@
  * Created by wujingtao on 2016/8/24 0024.
  */
 
-/*测试on 和 send*/
+/*测试 on 和 send*/
 
-import {on,off,send} from '../src/index';
+const {on,send} = require('../src/index');
 
 on('test',data=>{
     console.log('1:',data);

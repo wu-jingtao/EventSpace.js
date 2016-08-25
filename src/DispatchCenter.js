@@ -8,15 +8,13 @@
  * 代表地址命名空间所对应的每一个分发层级
  */
 class DispatchLevel {
-    levelName = '';         //当前层级的名字
-    receiver = new Set();  //当前层级的接收器
-    children = new Map();  //子层级
-
     /**
      * @param {string} levelName 当前层级的名字
      */
     constructor(levelName = '') {
-        this.levelName = levelName;
+        this.levelName = levelName; //当前层级的名字
+        this.receiver = new Set();  //当前层级的接收器
+        this.children = new Map();  //子层级
     }
 }
 
@@ -106,12 +104,12 @@ function send(address, data) {
     receiver.forEach(item => item(data, address));
 }
 
-export default {
-    on,
-    off,
-    send: function (address, data) {
-        send(address, data);
-        send('__cache__receive.' + address, data);  //給缓存再发一份
-    },
-    dispatchList
-}
+
+
+exports.on = on;
+exports.off = off;
+exports.send = function (address, data) {
+    send(address, data);
+    send('__cache__receive.' + address, data);  //給缓存再发一份
+};
+exports.dispatchList = dispatchList;

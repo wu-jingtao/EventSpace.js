@@ -2,7 +2,7 @@
  * Created by wujingtao on 2016/8/24 0024.
  */
 
-import DispatchCenter from './DispatchCenter';
+const DispatchCenter = require('./DispatchCenter');
 
 /*数据缓存模块*/
 
@@ -45,8 +45,8 @@ function requestCache(address,callback_address) {
     DispatchCenter.send('__cache__request.' + address,callback_address);
 }
 
-export default {
+module.exports = {
     cacheData,
     cache,
     requestCache
-}
+};
