@@ -1,4 +1,6 @@
 # Datacast.js
+[English](blob/master/README.en.md)
+
 因为对`flux、redux、baobab`都不太满意，所以写了这个框架。
 
 这是一个数据层框架，工作方式类似于jQuery的自定义事件。一边通过注册接收器（receive）来获取数据
