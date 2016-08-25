@@ -1,5 +1,5 @@
 # Datacast.js
-因为对`flux、redux、baobab`都不太满意所以写了这个框架。
+因为对`flux、redux、baobab`都不太满意，所以写了这个框架。
 
 这是一个数据层框架，工作方式类似于jQuery的自定义事件。一边通过注册接收器（receive）来获取数据
 ，另一边通过（send）方法来向对应的接收器发送数据。
@@ -8,7 +8,7 @@
 
 地址字符串可以有层级关系。例如`grandfather.farther.children`，中间通过`.`来进行分割。
 
-对于接受器而言，子级接收器可以收发父级发来的消息。而对于发送函数来说，
+对于接受器而言，子级接收器可以收到父级发来的消息。而对于发送函数来说，
 父级可以向所有子级发送数据。
 
 例如：
@@ -136,16 +136,6 @@ function receive(address='', receiver)
  * @return {undefined}
  */
 function cancel(address='')
-```
-
-```javascript
-/**
- * 向指定地址发送消息
- * @param {string} address 接收地址(通过‘.’来分割层级)
- * @param data 要发送的数据
- * @return {undefined}
- */
-function send(address,data)
 ```
 
 ```javascript
