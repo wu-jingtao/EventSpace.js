@@ -4,7 +4,7 @@
 
 /*requestCache只会返回精确地址字符串所对应的数据，子级不会返回*/
 
-const {receive,send,cache,requestCache} = require('../src/index');
+const {receive,send,cache,requestCache} = require('../bin/index');
 
 receive('test',data=>{console.log(data)});
 receive('test2',data=>{console.log(data)});

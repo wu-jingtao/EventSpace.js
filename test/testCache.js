@@ -2,7 +2,7 @@
  * Created by wujingtao on 2016/8/25 0025.
  */
 
-const {receive,cancel,send,cache,requestCache,innerData} = require('../src/index');
+const {receive,cancel,send,cache,requestCache,innerData} = require('../bin/index');
 
 receive('test',data=>{
    console.log(data); 

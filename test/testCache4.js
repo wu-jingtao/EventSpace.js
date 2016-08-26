@@ -3,7 +3,7 @@
  */
 /*重复注册_只会注册一次*/
 
-const {receive,send,cache,requestCache} = require('../src/index');
+const {receive,send,cache,requestCache} = require('../bin/index');
 
 receive('test',data=>{
    console.log(data); 
