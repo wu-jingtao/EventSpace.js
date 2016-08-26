@@ -47,9 +47,26 @@ function requestCache(address, callback_address = '') {
     DispatchCenter.send(callback_address, result, false);
 }
 
+/**
+ * 直接获取cache中address对应的数据
+ * @param {string} address 数据传输的路径
+ * @return 保存在cache中的数据
+ */
+function getCache(address) {
+    let result;
+
+    if (address in cacheData) {
+        result = cacheData[address].data;
+        if (cacheData[address].onRequest)
+            result = cacheData[address].onRequest(result);
+    }
+    
+    return result;
+}
 
 module.exports = {
     cacheData,
     cache,
-    requestCache
+    requestCache,
+    getCache
 };

@@ -183,6 +183,15 @@ function requestCache(address,callback_address)
 ```
 
 ```javascript
+/**
+* direct access address corresponding to the data in the cache
+* @ param {string} the address data transmission path
+* @ return to save the data in the cache
+*/
+function getCache(address)
+```
+
+```javascript
 innerData:{     //internal objects,
     cacheData,  // save cached data in the corresponding address
     dispatchList// saved all the receiver function

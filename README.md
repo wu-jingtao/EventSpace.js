@@ -171,6 +171,15 @@ function requestCache(address,callback_address)
 ```
 
 ```javascript
+/**
+ * 直接获取cache中address对应的数据
+ * @param {string} address 数据传输的路径
+ * @return 保存在cache中的数据
+ */
+function getCache(address)
+```
+
+```javascript
 innerData:{     //内部对象，
     cacheData,  //保存了对应地址上缓存的数据
     dispatchList//保存了所有接收器函数
