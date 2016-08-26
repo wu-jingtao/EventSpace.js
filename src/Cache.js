@@ -16,11 +16,12 @@ const cacheData = {};
  * @param {string} address 数据传输的路径
  * @param {function} onReceive 可选参数，当缓存器接收到新的缓存数据的时候触发。该回调函数接受两个参数（newValue:新值，oldValue：旧值） 执行完后需要返回一个值来替换缓存器中的值
  * @param {function} onRequest 可选参数，当缓存器接收到获取缓存器数据请求时触发。该回调函数接受一个参数（Value:缓存的值） 执行完后需要返回一个值来返回给请求者
+ * @param  defaultValue 可选参数，默认值
  * @return {undefined}
  */
-function cache(address, onReceive, onRequest) {
+function cache(address, onReceive, onRequest,defaultValue) {
     if (!(address in cacheData)) {  //确保不会重复注册
-        cacheData[address] = {data: undefined, onRequest};
+        cacheData[address] = {data: defaultValue, onRequest};
         DispatchCenter.receive('__cache__receive.' + address, data => {
             if (onReceive)
                 data = onReceive(data, cacheData[address].data);

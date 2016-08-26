@@ -168,9 +168,10 @@ function send(address,data)
 * @ param {string} the address data transmission path
 * @ param {function} onReceive optional parameters, when the cache receives the new cache data to trigger.The callback function accepts two parameters (newValue: new value, oldValue: old value) after the execution needs to return a value to replace the values in the cache
 * @ param {function} onRequest optional parameters, when the cache to receive access to cache data request is triggered.The callback function accepts a parameter (Value: the Value of cache) after the execution needs to return a Value is returned to the requester
+* @ param  defaultValue optional parameters，defaultvalue
 * @ return {undefined}
 */
-function cache(address, onReceive, onRequest)
+function cache(address, onReceive, onRequest, defaultValue)
 ```
 
 ```javascript
