@@ -1,6 +1,6 @@
 {
   "name": "datacast",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "a data layer framework",
   "main": "bin/index.js",
   "repository": {
