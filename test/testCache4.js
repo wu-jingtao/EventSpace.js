@@ -9,7 +9,7 @@ receive('test',data=>{
    console.log(data); 
 });
 
-cache('test',(newVal,oldVal)=>{
+cache('test',undefined,(newVal,oldVal)=>{
    console.log('1-in',newVal,oldVal);
    return newVal;
 },(val)=>{
@@ -17,7 +17,7 @@ cache('test',(newVal,oldVal)=>{
    return val;
 });
 
-cache('test',(newVal,oldVal)=>{
+cache('test',undefined,(newVal,oldVal)=>{
    console.log('2-in',newVal,oldVal);
    return newVal;
 },(val)=>{

@@ -17,9 +17,10 @@ var cacheData = _require2.cacheData;
 var cache = _require2.cache;
 var requestCache = _require2.requestCache;
 var getCache = _require2.getCache;
+var setCache = _require2.setCache;
 
 
 module.exports = {
-  receive: receive, cancel: cancel, send: send, cache: cache, requestCache: requestCache, getCache: getCache,
+  receive: receive, cancel: cancel, send: send, cache: cache, requestCache: requestCache, getCache: getCache, setCache: setCache,
   innerData: { cacheData: cacheData, dispatchList: dispatchList }
 };

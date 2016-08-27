@@ -8,7 +8,7 @@ receive('test',data=>{
    console.log(data); 
 });
 
-cache('test',(newVal,oldVal)=>{
+cache('test',undefined,(newVal,oldVal)=>{
    console.log(newVal,oldVal);
    return 321;
 },(val)=>{

@@ -11,7 +11,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /*数据分发中心*/
 
 /**
- * 代表地址命名空间所对应的每一个分发层级
+ *代表所对应路径的每一个分发层级
  */
 var DispatchLevel =
 /**
@@ -31,24 +31,24 @@ var dispatchList = new DispatchLevel('root');
 
 /**
  * 注册数据接收器
- * @param {string} address 接收地址.(字符串通过‘.’来分割层级)
- * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，address:接收到的地址字符串）
+ * @param {string} path 接收哪一条路径上的数据.(字符串通过‘.’来分割层级)
+ * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，path:路径字符串）
  * @return {function} 返回 receiver
  */
 function receive() {
-    var address = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var path = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
     var receiver = arguments[1];
 
 
     if (typeof receiver !== 'function') /*验证数据类型*/
         throw new Error('receiver is not a function');
 
-    address = address.split('.'); //分割地址的命名空间
+    path = path.split('.'); //分割地址的命名空间
 
     var level = dispatchList.children;
 
-    address.forEach(function (item, index) {
-        //循环每一级命名空间,找到对应的层级
+    path.forEach(function (item, index) {
+        //循环每一级,找到对应的层级
 
         if (!level.has(item)) {
             level.set(item, new DispatchLevel(item));
@@ -56,7 +56,7 @@ function receive() {
 
         var currentLevel = level.get(item);
 
-        if (index === address.length - 1) currentLevel.receiver.add(receiver);
+        if (index === path.length - 1) currentLevel.receiver.add(receiver);
 
         level = currentLevel.children;
     });
@@ -66,23 +66,23 @@ function receive() {
 
 /**
  * 注销数据接收器
- * @param {string} address 接收地址.(字符串通过‘.’来分割层级)
+ * @param {string} path 注销哪一条路径，以及它的子级.(字符串通过‘.’来分割层级)
  * @return {undefined}
  */
 function cancel() {
-    var address = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var path = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
 
 
     var level = dispatchList.children;
 
-    address = address.split('.'); //分割地址的命名空间
+    path = path.split('.'); //分割地址的命名空间
 
-    address.some(function (item, index) {
+    path.some(function (item, index) {
         var currentLevel = level.get(item);
 
         if (currentLevel == null) return true; //跳出循环
 
-        if (index === address.length - 1) {
+        if (index === path.length - 1) {
             currentLevel.receiver.clear();
             currentLevel.children.clear();
         }
@@ -124,27 +124,30 @@ function getAllChildrenReceiver(targetLevel) {
 }
 
 /**
- * 向指定地址发送消息
- * @param {string} address 接收地址(通过‘.’来分割层级)
+ * 向指定路径发送消息
+ * @param {string} path 向哪一条路径发送数据.(通过‘.’来分割层级)
  * @param data 要发送的数据
  * @return {undefined}
  */
-function _send(address, data) {
+function _send() {
+    var path = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var data = arguments[1];
+
 
     var level = dispatchList.children;
 
-    var addressLevel = address.split('.'); //分割地址的命名空间
+    var pathLevel = path.split('.'); //分割地址的命名空间
 
     var targetLevel = null;
 
-    addressLevel.some(function (item, index) {
+    pathLevel.some(function (item, index) {
         //循环每一个层级
 
         var currentLevel = level.get(item); //获取当前层级
 
         if (currentLevel == null) return true; //跳出循环
 
-        if (index === addressLevel.length - 1) targetLevel = currentLevel; //获取目标层级
+        if (index === pathLevel.length - 1) targetLevel = currentLevel; //获取目标层级
 
         level = currentLevel.children;
     });
@@ -152,7 +155,7 @@ function _send(address, data) {
     if (targetLevel) {
         var receiver = getAllChildrenReceiver(targetLevel);
         receiver.forEach(function (item) {
-            return item(data, address);
+            return item(data, path);
         });
     }
 }
@@ -162,14 +165,14 @@ module.exports = {
 
     /**
      * send的包装方法
-     * @param address
+     * @param path
      * @param data
-     * @param needSendToCache   是否需要将这个数据发送给Cache
+     * @param needSendToCache   是否需要将这个数据发送给Cache（这个一般只在内部使用）
      */
-    send: function send(address, data) {
+    send: function send(path, data) {
         var needSendToCache = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
 
-        _send(address, data);
-        if (needSendToCache) _send('__cache__receive.' + address, data); //給缓存再发一份
+        _send(path, data);
+        if (needSendToCache) _send('__cache__receive.' + path, data); //給缓存再发一份
     }
 };
