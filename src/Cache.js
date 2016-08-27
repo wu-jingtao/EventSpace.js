@@ -33,7 +33,7 @@ function cache(path, defaultValue, onReceive, onRequest) {
 
 /**
  * 请求cache中的数据
- * @param {string} path 请求哪一条路径在缓冲中的值
+ * @param {string} path 请求哪一条路径在缓存中的值
  * @param {string} callback_path 要把数据发到哪一条路径上
  */
 function requestCache(path, callback_path = '') {

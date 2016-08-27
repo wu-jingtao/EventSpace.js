@@ -46,7 +46,7 @@ send('test.2.3','c');
 
 ###Through ` cache ` to save the data for the last time send
 
-Event listeners a model is that the listener can't actively request data to the sender, if the sender is no longer hair at a time
+Event listeners a model is that the listener can't actively request data to the sender, if the sender is no longer send at a time
 The listener will never reach.
 
 But sometimes really need to finish the registration immediately after the listeners to obtain a data is used to initialize the,
@@ -103,24 +103,34 @@ receive('test',data=>{
    console.log(data);
 });
 
-cache('test',(newVal,oldVal) => {
-   console.log(newVal,oldVal);
-
-   localStorage['test'] = newVal;
-
+cache('test',undefined,(newVal,oldVal)=>{
+   console.log('1-in',newVal,oldVal);
    return newVal;
-},(val) => {
-    if(val == null)
-        val = localStorage['test'];
+},(val)=>{
+   console.log('1-out',val);
+   return val;
+});
 
-   console.log(val);
-
+cache('test',undefined,(newVal,oldVal)=>{
+   console.log('2-in',newVal,oldVal);
+   return newVal;
+},(val)=>{
+   console.log('2-out',val);
    return val;
 });
 
 send('test','123');
 
 requestCache('test','test');
+
+/*
+* output:
+*
+* 123
+* 1-in 123 undefined
+* 1-out 123
+* 123
+* */
 ```
 
 To here basically finished, if it is not very clear, suggested that direct look at the source code, there's not much line anyway.
@@ -170,7 +180,7 @@ function cache(path, defaultValue, onReceive, onRequest)
 ```javascript
 /**
 * request data from the cache
-* @ param {string} path which request the values in the path in the buffer
+* @ param {string} The values in the request which path in the cache
 * @ param {string} callback_path to which to send the data to a path
 */
 function requestCache(path, callback_path = '')

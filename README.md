@@ -98,24 +98,34 @@ receive('test',data=>{
    console.log(data);
 });
 
-cache('test',(newVal,oldVal) => {
-   console.log(newVal,oldVal);
-
-   localStorage['test'] = newVal;
-
+cache('test',undefined,(newVal,oldVal)=>{
+   console.log('1-in',newVal,oldVal);
    return newVal;
-},(val) => {
-    if(val == null)
-        val = localStorage['test'];
+},(val)=>{
+   console.log('1-out',val);
+   return val;
+});
 
-   console.log(val);
-
+cache('test',undefined,(newVal,oldVal)=>{
+   console.log('2-in',newVal,oldVal);
+   return newVal;
+},(val)=>{
+   console.log('2-out',val);
    return val;
 });
 
 send('test','123');
 
 requestCache('test','test');
+
+/*
+* output:
+*
+* 123
+* 1-in 123 undefined
+* 1-out 123
+* 123
+* */
 ```
 
 到这基本上就介绍完了，如果觉得不是很清楚，建议直接看看源代码，反正也没多少行。
@@ -165,7 +175,7 @@ function cache(path, defaultValue, onReceive, onRequest)
 ```javascript
 /**
  * 请求cache中的数据
- * @param {string} path 请求哪一条路径在缓冲中的值
+ * @param {string} path 请求哪一条路径在缓存中的值
  * @param {string} callback_path 要把数据发到哪一条路径上
  */
 function requestCache(path, callback_path = '')
