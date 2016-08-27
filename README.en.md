@@ -3,19 +3,18 @@
 [中文](README.md)
 
 
-Because of ` flux, redux, baobab ` are not satisfied with, so I write this framework.
+Because `flux, redux, baobab` are not satisfied, so I wrote this framework.
 
-This is a data layer framework, work similar to the jQuery custom events.Side by registering the receiver ` receive ` to obtain data
-, on the other side through ` send ` method corresponding to transmit data.
+This is a data layer framework, works like jQuery custom events. One side to obtain data by registering a receiver ( `receive` method)
+The other side send data to a corresponding receiver by `send` methods.
 
-Sending method ` send ` via a path string to determine which receivers need to be triggered.
+`Send` method by which to determine a path string receiver needs to be triggered.
+ 
+Path string can have a hierarchy. For example `grandfather.father.children`, `.` through the middle to split.
 
-Path string can have a hierarchy.For example ` grandfather. Farther. Children `, intermediate by `. ` for segmentation.
+For the receiver, the child can receive the data from parent. For sending function, the parent can send data to all children.
 
-For the receiver, the child receiver can get data from the parent.And for sending function,
-The parent can send data to all children.
-
-Such as:
+E.g：
 ```javascript
 receive('test',data=>{
     console.log('1:',data);
@@ -44,29 +43,30 @@ send('test.2.3','c');
 * */
 ```
 
-###Through ` cache ` to save the data for the last time send
+###Through `cache` to save the data from the last time send
 
-Event listeners a model is that the listener can't actively request data to the sender, if the sender is no longer send at a time
-The listener will never reach.
+Event listeners model there is a lack of is that the listener can't actively request data to the sender, 
+if the sender not send again, the listener will never reach.
 
-But sometimes really need to finish the registration immediately after the listeners to obtain a data is used to initialize the,
-By this time the cache can play a role.
 
-Through ` cache ` method which transmitted on a path to specify the cache data.After the cache can invoke ` requestCache ` method
-To cache the data sent to the receiver on another path.Or you can call ` getCache ` method directly obtained.
+But sometimes we do need After registering listeners obtain a data immediately，to initialize.
+
+Through ` cache ` function to cache the data from  the specify path.
+After cached. can invoke ` requestCache ` method To send the cached data to a receiver which on a another path.
+Or you can call ` getCache ` method directly to obtain.
 
 ` requestCache ` method takes two parameters.The first is the corresponding path string stored data in the cache,
-The second is to send data back to the path.
+The second is to send data back to which path.
 
-Such as:
+E.g：
 
 ```javascript
-receive('test',data=>{
-   console.log(data);
+receive('test',data => {
+   console.log('1:', data);
 });
 
-receive('test2',data=>{
-   console.log(data);
+receive('test2',data => {
+   console.log('2:', data);
 });
 
 cache('test');
@@ -78,25 +78,21 @@ requestCache('test','test2');
 /*
 * output:
 *
-* 123
-* 123
+* 1: 123
+* 2: 123
 * */
 ```
-####The persistent cache data
+####Persistent cache data
 
-` cache ` method besides can cache the data on the corresponding path can be controlled by (` onReceive `, ` onRequest `) it
-Two parameters to persist the data or to read data from the outside.
+` cache ` method besides can cache the data on the corresponding path can be controlled by (` onReceive `, ` onRequest `) 
+to save the data or to read data from the outside.
 
+`onReceive` will triggered when  `cache` received a new data。Through it, the data can be saved, or replacement The data save to the cache.
 
-In ` onReceive ` ` cache ` received when new data is triggered.Through which data can be saved, or replacement to save to
-The data from the cache.
+`onRequest`will triggered when get data from `cache`，Through it can read data from external  or replace
+the return data.
 
-
-` onRequest ` can be in when to get ` cache data in ` is triggered, through it can be read from an external data or replace
-To return to the data.
-
-
-Such as:
+E.g：
 
 ```javascript
 receive('test',data=>{
@@ -108,14 +104,6 @@ cache('test',undefined,(newVal,oldVal)=>{
    return newVal;
 },(val)=>{
    console.log('1-out',val);
-   return val;
-});
-
-cache('test',undefined,(newVal,oldVal)=>{
-   console.log('2-in',newVal,oldVal);
-   return newVal;
-},(val)=>{
-   console.log('2-out',val);
    return val;
 });
 
@@ -136,11 +124,13 @@ requestCache('test','test');
 To here basically finished, if it is not very clear, suggested that direct look at the source code, there's not much line anyway.
 
 ###API
+
+
 ```javascript
 /**
-* registration data receiver
-* @ param {string} path which receive the data on the path. (the string through the '. 'to split level)
-* @ param {function} receiver receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
+* register data receiver
+* @ param {string} receive data from which path . (the string through the '. 'to split level)
+* @ param {function} receiver Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
 * @ return {function} returns the receiver
 */
 function receive(path = '', receiver)
@@ -148,66 +138,67 @@ function receive(path = '', receiver)
 
 ```javascript
 /**
-* cancellation data receiver
-* @ param {string} path which cancellation path, as well as their children's. (the string through the '. 'to split level)
-* @ return {undefined}
-*/
+ * cancellation data receiver
+ * @param {string} path cancel which path，And its children.(the string through the '. 'to split level)
+ * @return {undefined}
+ */
 function cancel(path = '')
 ```
 
 ```javascript
 /**
-* send a message to the specified path
-* @ param {string} path which path to send data to. (split level through the '. ')
-* @ param data to send data
-* @ return {undefined}
-*/
+ * Send the message to the specified path
+ * @param {string} path Send data to which path.
+ * @param data Data
+ * @return {undefined}
+ */
 function send(path = '', data)
 ```
 
 ```javascript
 /**
-* the cache the data on the specified path
-* @ param {string} which path cache the data on the path
-* @ param defaultValue optional parameters, the default value
-* @ param {function} onReceive optional parameters, trigger when update the cached data.The callback function accepts two parameters (newValue: new value, oldValue: old value) after the execution needs to return a value to replace to cache
-* @ param {function} onRequest optional parameters, trigger when access to cache data.The callback function accepts a parameter (Value: the Value of cache) after the execution needs to return a Value to the caller
-* @ return {undefined}
-*/
+ * Cache the data on the specified path
+ * @param {string} path cache data from which path
+ * @param  defaultValue Optional parameters, the default values
+ * @param {function} onReceive Optional parameters,Triggered when update the data in the cache。The callback function accepts two parameters (newValue: new value, oldValue: old value) after the execution needs to return a value, used to replace to cache values
+ * @param {function} onRequest Optional parameters，Triggered when get the data from the cache。The callback function accepts a parameter (Value: the Value in the cache) after the execution needs to return a Value to the caller
+ * @return {undefined}
+ */
 function cache(path, defaultValue, onReceive, onRequest)
 ```
 
 ```javascript
 /**
-* request data from the cache
-* @ param {string} The values in the request which path in the cache
-* @ param {string} callback_path to which to send the data to a path
-*/
+ * request data from cache
+ * @param {string} path The values of the corresponding path in the cache
+ * @param {string} callback_path Want to send the data to which path
+ * @return {undefined}
+ */
 function requestCache(path, callback_path = '')
 ```
 
 ```javascript
 /**
-* direct access path for data from the cache
-* @ param {string} path data transmission path
-* @ return to save the data in the cache
-*/
+ * get the data from cache directly
+ * @param {string} path The values of the corresponding path in the cache
+ * @return data in the cache
+ */
 function getCache(path)
 ```
 
 ```javascript
 /**
-* set the path for the data in the cache
-* @ param {string} path path
-* @ param data to set up the data
-* @ return {undefined}
-*/
+ * set data in the cache directly
+ * @param {string} path  The values of the corresponding path in the cache
+ * @param data Data
+ * @return {undefined}
+ */
 function setCache(path, data)
 ```
 
 ```javascript
-innerData:{     //internal objectsi
-    cacheData,  //save cached data in the corresponding address
-    dispatchList//to save all the receiver function
+innerData:{     //Internal object
+    cacheData,  
+    dispatchList
 }
 ```

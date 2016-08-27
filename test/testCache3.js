@@ -6,8 +6,8 @@
 
 const {receive,send,cache,requestCache} = require('../bin/index');
 
-receive('test',data=>{console.log(data)});
-receive('test2',data=>{console.log(data)});
+receive('test',data => {console.log(data)});
+receive('test2',data => {console.log(data)});
 
 cache('test');
 cache('test.2');
