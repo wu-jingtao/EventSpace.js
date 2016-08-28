@@ -7,8 +7,7 @@ npm install datacast --save
 
 [中文](README.md)
 
-
-Because `flux, redux, baobab` are not satisfied, so I wrote this framework.
+Because of ` flux, redux, baobab ` are not satisfied with, so I write this framework.
 
 This is a data layer framework, works like jQuery custom events. One side to obtain data by registering a receiver ( `receive` method)
 The other side send data to a corresponding receiver by `send` methods.
@@ -57,11 +56,11 @@ if the sender not send again, the listener will never reach.
 But sometimes we do need After registering listeners obtain a data immediately，to initialize.
 
 Through ` cache ` function to cache the data from  the specify path.
-After cached. can invoke ` requestCache ` method To send the cached data to a receiver which on a another path.
-Or you can call ` getCache ` method directly to obtain.
+After cached. can invoke ` requestCache ` method to send the cached data to a receiver which on a another path.
+Or you can call ` getCache ` method to obtain directly.
 
-` requestCache ` method takes two parameters.The first is a path string corresponding to the data stored in the cache,
-The second is to send the data  to which path.
+` requestCache ` method takes two parameters.The first is a path string ,corresponding to the data stored in the cache,
+The second is a path, send the data  to which path.
 
 E.g：
 
