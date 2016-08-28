@@ -1,4 +1,9 @@
 # Datacast.js
+
+```
+npm install datacast --save
+```
+
 [English](README.en.md)
 
 因为对`flux、redux、baobab`都不太满意，所以写了这个框架。
@@ -98,9 +103,11 @@ receive('test',data=>{
 
 cache('test',undefined,(newVal,oldVal)=>{
    console.log('1-in',newVal,oldVal);
+   window.localStorage['test'] = newVal;
    return newVal;
 },(val)=>{
    console.log('1-out',val);
+   val = window.localStorage['test'];
    return val;
 });
 

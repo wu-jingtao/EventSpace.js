@@ -1,14 +1,18 @@
 {
   "name": "datacast",
-  "version": "0.1.7",
-  "description": "a data layer framework",
+  "version": "0.1.8",
+  "description": "a data broadcast framework",
   "main": "bin/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mx601595686/Datacast.js.git"
   },
   "keywords": [
-    "datacast"
+    "data",
+    "datacast",
+    "data-cast",
+    "broadcast",
+    "cast"
   ],
   "author": "wujingtao",
   "license": "MIT",

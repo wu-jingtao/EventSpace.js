@@ -1,5 +1,10 @@
 # Datacast.js
 
+
+```
+npm install datacast --save
+```
+
 [中文](README.md)
 
 
@@ -8,11 +13,11 @@ Because `flux, redux, baobab` are not satisfied, so I wrote this framework.
 This is a data layer framework, works like jQuery custom events. One side to obtain data by registering a receiver ( `receive` method)
 The other side send data to a corresponding receiver by `send` methods.
 
-`Send` method by which to determine a path string receiver needs to be triggered.
+`Send` method by a path string to determine which receiver needs to be triggered.
  
-Path string can have a hierarchy. For example `grandfather.father.children`, `.` through the middle to split.
+Path string can have a hierarchy. For example `grandfather.father.children`,  through `.` to split.
 
-For the receiver, the child can receive the data from parent. For sending function, the parent can send data to all children.
+For the receiver, the child can receive the data from parent. For sending method, the parent can send data to all children.
 
 E.g：
 ```javascript
@@ -45,7 +50,7 @@ send('test.2.3','c');
 
 ###Through `cache` to save the data from the last time send
 
-Event listeners model there is a lack of is that the listener can't actively request data to the sender, 
+Event listeners model has a weakness, is that the listener can't actively request data to the sender, 
 if the sender not send again, the listener will never reach.
 
 
@@ -55,8 +60,8 @@ Through ` cache ` function to cache the data from  the specify path.
 After cached. can invoke ` requestCache ` method To send the cached data to a receiver which on a another path.
 Or you can call ` getCache ` method directly to obtain.
 
-` requestCache ` method takes two parameters.The first is the corresponding path string stored data in the cache,
-The second is to send data back to which path.
+` requestCache ` method takes two parameters.The first is a path string corresponding to the data stored in the cache,
+The second is to send the data  to which path.
 
 E.g：
 
@@ -84,13 +89,12 @@ requestCache('test','test2');
 ```
 ####Persistent cache data
 
-` cache ` method besides can cache the data on the corresponding path can be controlled by (` onReceive `, ` onRequest `) 
+` cache ` method besides can cache the data on the corresponding path ,and can be use (` onReceive `, ` onRequest `)
 to save the data or to read data from the outside.
 
-`onReceive` will triggered when  `cache` received a new data。Through it, the data can be saved, or replacement The data save to the cache.
+`onReceive` will triggered when  `cache` received a new data。Through it, the data can be saved in outside, or replace The saving data.
 
-`onRequest`will triggered when get data from `cache`，Through it can read data from external  or replace
-the return data.
+`onRequest`will triggered when get data from `cache`，Through it can read data from external or replace the return data.
 
 E.g：
 
@@ -101,9 +105,11 @@ receive('test',data=>{
 
 cache('test',undefined,(newVal,oldVal)=>{
    console.log('1-in',newVal,oldVal);
+   window.localStorage['test'] = newVal;
    return newVal;
 },(val)=>{
    console.log('1-out',val);
+   val = window.localStorage['test'];
    return val;
 });
 
