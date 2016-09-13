@@ -15,13 +15,16 @@ var cacheData = {};
 
 /**
  * 缓存指定路径上的数据
- * @param {string} path 缓存哪一条路径上的数据
+ * @param {string|Array} path 缓存哪一条路径上的数据
  * @param  defaultValue 可选参数，默认值
- * @param {function} onReceive 可选参数，当更新缓存数据的时候触发。该回调函数接受两个参数（newValue:新值，oldValue：旧值） 执行完后需要返回一个值来替换要缓存的值
+ * @param {function} onReceive 可选参数，当更新缓存数据的时候触发。该回调函数接受两个参数（newValue:新值，oldValue：旧值） 执行完后需要返回一个值,用来替换要缓存的值
  * @param {function} onRequest 可选参数，当获取缓存数据的时候触发。该回调函数接受一个参数（Value:缓存的值） 执行完后需要返回一个值给调用者
  * @return {undefined}
  */
 function cache(path, defaultValue, onReceive, onRequest) {
+
+    if (Array.isArray(path)) path = path.join('.');
+
     if (!(path in cacheData)) {
         //确保不会重复注册
         cacheData[path] = { data: defaultValue, onRequest: onRequest, onReceive: onReceive };
@@ -35,11 +38,13 @@ function cache(path, defaultValue, onReceive, onRequest) {
 
 /**
  * 请求cache中的数据
- * @param {string} path 请求哪一条路径在缓冲中的值
- * @param {string} callback_path 要把数据发到哪一条路径上
+ * @param {string|Array} path 请求哪一条路径在缓存中的值
+ * @param {string|Array} callback_path 要把数据发到哪一条路径上
+ * @return {undefined}
  */
-function requestCache(path) {
-    var callback_path = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+function requestCache(path, callback_path) {
+
+    if (Array.isArray(path)) path = path.join('.');
 
     var result = void 0;
 
@@ -53,10 +58,13 @@ function requestCache(path) {
 
 /**
  * 直接获取path所对应cache中的数据
- * @param {string} path 数据传输的路径
+ * @param {string|Array} path 数据传输的路径
  * @return 保存在cache中的数据
  */
 function getCache(path) {
+
+    if (Array.isArray(path)) path = path.join('.');
+
     var result = void 0;
 
     if (path in cacheData) {
@@ -69,11 +77,14 @@ function getCache(path) {
 
 /**
  * 设置path所对应cache中的数据
- * @param {string} path 路径
+ * @param {string|Array} path 路径
  * @param data 要设置的数据
  * @return {undefined}
  */
 function setCache(path, data) {
+
+    if (Array.isArray(path)) path = path.join('.');
+
     if (path in cacheData) {
 
         if (cacheData[path].onReceive) data = cacheData[path].onReceive(data, cacheData[path].data);

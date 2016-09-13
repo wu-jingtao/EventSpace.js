@@ -27,23 +27,33 @@ function DispatchLevel() {
     this.children = new Map(); //子层级
 };
 
+/**
+ * 转换路径字符串的类型
+ * @param {string|Array} path
+ */
+
+
+function convertPathType(path) {
+    if (typeof path === 'string') //验证path的数据类型
+        path = path.split('.');else if (!Array.isArray(path)) throw new Error('path must be a string or array');
+
+    return path;
+}
+
 var dispatchList = new DispatchLevel('root');
 
 /**
  * 注册数据接收器
- * @param {string} path 接收哪一条路径上的数据.(字符串通过‘.’来分割层级)
- * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，path:路径字符串）
+ * @param {string|Array} path 接收哪一条路径上的数据.可以为字符串或数组(字符串通过‘.’来分割层级)
+ * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，path:路径字符串数组）
  * @return {function} 返回 receiver
  */
-function receive() {
-    var path = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-    var receiver = arguments[1];
+function receive(path, receiver) {
 
+    path = convertPathType(path);
 
     if (typeof receiver !== 'function') /*验证数据类型*/
         throw new Error('receiver is not a function');
-
-    path = path.split('.'); //分割地址的命名空间
 
     var level = dispatchList.children;
 
@@ -66,16 +76,14 @@ function receive() {
 
 /**
  * 注销数据接收器
- * @param {string} path 注销哪一条路径，以及它的子级.(字符串通过‘.’来分割层级)
+ * @param {string|Array} path 注销哪一条路径，以及它的子级.可以为字符串或数组(字符串通过‘.’来分割层级)
  * @return {undefined}
  */
-function cancel() {
-    var path = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+function cancel(path) {
 
+    path = convertPathType(path);
 
     var level = dispatchList.children;
-
-    path = path.split('.'); //分割地址的命名空间
 
     path.some(function (item, index) {
         var currentLevel = level.get(item);
@@ -125,18 +133,16 @@ function getAllChildrenReceiver(targetLevel) {
 
 /**
  * 向指定路径发送消息
- * @param {string} path 向哪一条路径发送数据.(通过‘.’来分割层级)
+ * @param {string|Array} path 向哪一条路径发送数据.可以为字符串或数组(字符串通过‘.’来分割层级)
  * @param data 要发送的数据
  * @return {undefined}
  */
-function _send() {
-    var path = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-    var data = arguments[1];
-
+function _send(path, data) {
+    //验证数据类型以及分割字符串放在下面在
 
     var level = dispatchList.children;
 
-    var pathLevel = path.split('.'); //分割地址的命名空间
+    var pathLevel = path;
 
     var targetLevel = null;
 
@@ -172,7 +178,10 @@ module.exports = {
     send: function send(path, data) {
         var needSendToCache = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
 
+
+        path = convertPathType(path);
+
         _send(path, data);
-        if (needSendToCache) _send('__cache__receive.' + path, data); //給缓存再发一份
+        if (needSendToCache) _send(['__cache__receive'].concat(_toConsumableArray(path)), data); //給缓存再发一份
     }
 };

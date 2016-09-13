@@ -134,36 +134,36 @@ To here basically finished, if it is not very clear, suggested that direct look 
 ```javascript
 /**
 * register data receiver
-* @ param {string} receive data from which path . (the string through the '. 'to split level)
+* @ param {string|Array} receive data from which path .can be a string or array (the string through the '. 'to split level)
 * @ param {function} receiver Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
 * @ return {function} returns the receiver
 */
-function receive(path = '', receiver)
+function receive(path, receiver)
 ```
 
 ```javascript
 /**
  * cancellation data receiver
- * @param {string} path cancel which path，And its children.(the string through the '. 'to split level)
+ * @param {string|Array} path cancel which path，And its children.can be a string or array(the string through the '. 'to split level)
  * @return {undefined}
  */
-function cancel(path = '')
+function cancel(path)
 ```
 
 ```javascript
 /**
  * Send the message to the specified path
- * @param {string} path Send data to which path.
+ * @param {string|Array} path Send data to which path.
  * @param data Data
  * @return {undefined}
  */
-function send(path = '', data)
+function send(path, data)
 ```
 
 ```javascript
 /**
  * Cache the data on the specified path
- * @param {string} path cache data from which path
+ * @param {string|Array} path cache data from which path
  * @param  defaultValue Optional parameters, the default values
  * @param {function} onReceive Optional parameters,Triggered when update the data in the cache。The callback function accepts two parameters (newValue: new value, oldValue: old value) after the execution needs to return a value, used to replace to cache values
  * @param {function} onRequest Optional parameters，Triggered when get the data from the cache。The callback function accepts a parameter (Value: the Value in the cache) after the execution needs to return a Value to the caller
@@ -175,17 +175,17 @@ function cache(path, defaultValue, onReceive, onRequest)
 ```javascript
 /**
  * request data from cache
- * @param {string} path The values of the corresponding path in the cache
+ * @param {string|Array} path The values of the corresponding path in the cache
  * @param {string} callback_path Want to send the data to which path
  * @return {undefined}
  */
-function requestCache(path, callback_path = '')
+function requestCache(path, callback_path)
 ```
 
 ```javascript
 /**
  * get the data from cache directly
- * @param {string} path The values of the corresponding path in the cache
+ * @param {string|Array} path The values of the corresponding path in the cache
  * @return data in the cache
  */
 function getCache(path)
@@ -194,7 +194,7 @@ function getCache(path)
 ```javascript
 /**
  * set data in the cache directly
- * @param {string} path  The values of the corresponding path in the cache
+ * @param {string|Array} path  The values of the corresponding path in the cache
  * @param data Data
  * @return {undefined}
  */

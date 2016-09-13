@@ -4,14 +4,14 @@
 
 const {receive,cancel,send,cache,requestCache,innerData} = require('../src/index');
 
-receive('test',data=>{
+receive(['test'],data=>{
    console.log(data); 
 });
 
-cache('test');
+cache(['test']);
 
-send('test','123');
-send('test.2','321');
+send(['test'],'123');
+send(['test','2'],'321');
 
 requestCache('test','test');
 

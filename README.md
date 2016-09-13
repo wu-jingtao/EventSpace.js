@@ -133,36 +133,36 @@ requestCache('test','test');
 ```javascript
 /**
  * 注册数据接收器
- * @param {string} path 接收哪一条路径上的数据.(字符串通过‘.’来分割层级)
- * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，path:路径字符串）
+ * @param {string|Array} path 接收哪一条路径上的数据.可以为字符串或数组(字符串通过‘.’来分割层级)
+ * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，path:路径字符串数组）
  * @return {function} 返回 receiver
  */
-function receive(path = '', receiver)
+function receive(path, receiver)
 ```
 
 ```javascript
 /**
  * 注销数据接收器
- * @param {string} path 注销哪一条路径，以及它的子级.(字符串通过‘.’来分割层级)
+ * @param {string|Array} path 注销哪一条路径，以及它的子级.可以为字符串或数组(字符串通过‘.’来分割层级)
  * @return {undefined}
  */
-function cancel(path = '')
+function cancel(path)
 ```
 
 ```javascript
 /**
  * 向指定路径发送消息
- * @param {string} path 向哪一条路径发送数据.(通过‘.’来分割层级)
+ * @param {string|Array} path 向哪一条路径发送数据.可以为字符串或数组(字符串通过‘.’来分割层级)
  * @param data 要发送的数据
  * @return {undefined}
  */
-function send(path = '', data)
+function send(path, data)
 ```
 
 ```javascript
 /**
  * 缓存指定路径上的数据
- * @param {string} path 缓存哪一条路径上的数据
+ * @param {string|Array} path 缓存哪一条路径上的数据
  * @param  defaultValue 可选参数，默认值
  * @param {function} onReceive 可选参数，当更新缓存数据的时候触发。该回调函数接受两个参数（newValue:新值，oldValue：旧值） 执行完后需要返回一个值,用来替换要缓存的值
  * @param {function} onRequest 可选参数，当获取缓存数据的时候触发。该回调函数接受一个参数（Value:缓存的值） 执行完后需要返回一个值给调用者
@@ -174,17 +174,17 @@ function cache(path, defaultValue, onReceive, onRequest)
 ```javascript
 /**
  * 请求cache中的数据
- * @param {string} path 对应路径在缓存中的值
- * @param {string} callback_path 要把数据发到哪一条路径上
+ * @param {string|Array} path 对应路径在缓存中的值
+ * @param {string|Array} callback_path 要把数据发到哪一条路径上
  * @return {undefined}
  */
-function requestCache(path, callback_path = '')
+function requestCache(path, callback_path)
 ```
 
 ```javascript
 /**
  * 直接获取path所对应cache中的数据
- * @param {string} path 数据传输的路径
+ * @param {string|Array} path 数据传输的路径
  * @return 保存在cache中的数据
  */
 function getCache(path)
@@ -193,7 +193,7 @@ function getCache(path)
 ```javascript
 /**
  * 设置path所对应cache中的数据
- * @param {string} path 路径
+ * @param {string|Array} path 路径
  * @param data 要设置的数据
  * @return {undefined}
  */
