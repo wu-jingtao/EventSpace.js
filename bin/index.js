@@ -7,6 +7,7 @@
 var _require = require('./DispatchCenter');
 
 var receive = _require.receive;
+var receiveOnce = _require.receiveOnce;
 var cancel = _require.cancel;
 var send = _require.send;
 var dispatchList = _require.dispatchList;
@@ -21,6 +22,6 @@ var setCache = _require2.setCache;
 
 
 module.exports = {
-  receive: receive, cancel: cancel, send: send, cache: cache, requestCache: requestCache, getCache: getCache, setCache: setCache,
+  receive: receive, receiveOnce: receiveOnce, cancel: cancel, send: send, cache: cache, requestCache: requestCache, getCache: getCache, setCache: setCache,
   innerData: { cacheData: cacheData, dispatchList: dispatchList }
 };

@@ -23,11 +23,11 @@ class DispatchLevel {
  * @param {string|Array} path
  */
 function convertPathType(path) {
-    if(typeof path === 'string')    //验证path的数据类型
+    if (typeof path === 'string')    //验证path的数据类型
         path = path.split('.');
-    else if(!Array.isArray(path))
+    else if (!Array.isArray(path))
         throw new Error('path must be a string or array');
-    
+
     return path;
 }
 
@@ -40,7 +40,7 @@ const dispatchList = new DispatchLevel('root');
  * @return {function} 返回 receiver
  */
 function receive(path, receiver) {
-    
+
     path = convertPathType(path);
 
     if (typeof receiver !== 'function')  /*验证数据类型*/
@@ -62,6 +62,20 @@ function receive(path, receiver) {
         level = currentLevel.children;
     });
 
+    return receiver;
+}
+
+/**
+ * 注册只接收一次的数据接收器
+ * @param {string|Array} path 接收哪一条路径上的数据.可以为字符串或数组(字符串通过‘.’来分割层级)
+ * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，path:路径字符串数组）
+ * @return {function} 返回 receiver
+ */
+function receiveOnce(path, receiver) {
+    receive(path, function (d, p) {
+        receiver(d, p);
+        cancel(path);
+    });
     return receiver;
 }
 
@@ -135,7 +149,7 @@ function send(path, data) {
 }
 
 module.exports = {
-    receive, cancel, dispatchList,
+    receive, receiveOnce, cancel, dispatchList,
 
     /**
      * send的包装方法
@@ -149,7 +163,7 @@ module.exports = {
 
         send(path, data);
         if (needSendToCache)
-            send(['__cache__receive',...path], data);  //給缓存再发一份
+            send(['__cache__receive', ...path], data);  //給缓存再发一份
     }
 };
 

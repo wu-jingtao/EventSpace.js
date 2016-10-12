@@ -75,6 +75,20 @@ function receive(path, receiver) {
 }
 
 /**
+ * 注册只接收一次的数据接收器
+ * @param {string|Array} path 接收哪一条路径上的数据.可以为字符串或数组(字符串通过‘.’来分割层级)
+ * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，path:路径字符串数组）
+ * @return {function} 返回 receiver
+ */
+function receiveOnce(path, receiver) {
+    receive(path, function (d, p) {
+        receiver(d, p);
+        cancel(path);
+    });
+    return receiver;
+}
+
+/**
  * 注销数据接收器
  * @param {string|Array} path 注销哪一条路径，以及它的子级.可以为字符串或数组(字符串通过‘.’来分割层级)
  * @return {undefined}
@@ -167,7 +181,7 @@ function _send(path, data) {
 }
 
 module.exports = {
-    receive: receive, cancel: cancel, dispatchList: dispatchList,
+    receive: receive, receiveOnce: receiveOnce, cancel: cancel, dispatchList: dispatchList,
 
     /**
      * send的包装方法
