@@ -1,6 +1,6 @@
 {
   "name": "datacast",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "a data broadcast framework",
   "main": "bin/index.js",
   "repository": {

@@ -6,7 +6,6 @@ npm install datacast --save
 
 [English](README.en.md)
 
-因为对`flux、redux、baobab`都不太满意，所以写了这个框架。
 
 这是一个数据层框架，工作方式类似于jQuery的自定义事件。一边通过注册接收器(`receive`方法)来获取数据
 ，另一边通过`send`方法来向对应的接收器发送数据。

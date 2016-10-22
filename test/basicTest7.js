@@ -15,6 +15,10 @@ receiveOnce('test.2',data=>{
     console.log('2:',data);
 });
 
+receiveOnce('test',data=>{
+    console.log('3:',data);
+});
+
 send('test','a');
 send('test','b');
 send('test.2','c');
@@ -23,4 +27,5 @@ send('test.2','c');
  * output:
  1: a
  2: a
+ 3: a
  * */

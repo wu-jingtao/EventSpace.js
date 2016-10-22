@@ -72,6 +72,13 @@ function receive(path, receiver) {
  * @return {function} 返回 receiver
  */
 function receiveOnce(path, receiver) {
+
+    if (typeof receiver !== 'function')  /*验证数据类型*/
+        throw new Error('receiver is not a function');
+
+    path = convertPathType(path);
+    path.push(`${Math.random()}`.split('0')[1]);  //确保只删除自身
+
     receive(path, function (d, p) {
         receiver(d, p);
         cancel(path);

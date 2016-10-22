@@ -7,7 +7,6 @@ npm install datacast --save
 
 [中文](README.md)
 
-Because of ` flux, redux, baobab ` are not satisfied with, so I write this framework.
 
 This is a data layer framework, works like jQuery custom events. One side to obtain data by registering a receiver ( `receive` method)
 The other side send data to a corresponding receiver by `send` methods.
