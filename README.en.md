@@ -14,6 +14,7 @@ The other side send data to a corresponding receiver by `send` methods.
 `Send` method by a path string to determine which receiver needs to be triggered.
  
 Path string can have a hierarchy. For example `grandfather.father.children`,  through `.` to split.
+（it also can be a array，For example`['grandfather','farther','children']`）
 
 For the receiver, the child can receive the data from parent. For sending method, the parent can send data to all children.
 
@@ -133,9 +134,9 @@ To here basically finished, if it is not very clear, suggested that direct look 
 ```javascript
 /**
 * register a data receiver
-* @ param {string|Array} receive data from which path .can be a string or array (the string through the '. 'to split level)
-* @ param {function} receiver Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
-* @ return {function} returns the receiver
+* @ param {string|Array} receive     data from which path .can be a string or array (the string through the '. 'to split level)
+* @ param {function} receiver        Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
+* @ return {function}                returns the receiver
 */
 function receive(path, receiver)
 ```
@@ -143,9 +144,9 @@ function receive(path, receiver)
 ```javascript
 /**
 * register a data receiver, which will be triggered  only once
-* @ param {string|Array} receive data from which path .can be a string or array (the string through the '. 'to split level)
-* @ param {function} receiver Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
-* @ return {function} returns the receiver
+* @ param {string|Array} receive         data from which path .can be a string or array (the string through the '. 'to split level)
+* @ param {function} receiver            Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
+* @ return {function}                    returns the receiver
  */
 function receiveOnce(path, receiver)
 ```
@@ -153,7 +154,7 @@ function receiveOnce(path, receiver)
 ```javascript
 /**
  * cancellation data receiver
- * @param {string|Array} path cancel which path，And its children.can be a string or array(the string through the '. 'to split level)
+ * @param {string|Array} path            cancel which path，And its children.can be a string or array(the string through the '. 'to split level)
  * @return {undefined}
  */
 function cancel(path)
@@ -162,8 +163,8 @@ function cancel(path)
 ```javascript
 /**
  * Send the message to the specified path
- * @param {string|Array} path Send data to which path.
- * @param data Data
+ * @param {string|Array} path     Send data to which path.
+ * @param data                    Data
  * @return {undefined}
  */
 function send(path, data)
@@ -172,10 +173,10 @@ function send(path, data)
 ```javascript
 /**
  * Cache the data on the specified path
- * @param {string|Array} path cache data from which path
- * @param  defaultValue Optional parameters, the default values
- * @param {function} onReceive Optional parameters,Triggered when update the data in the cache。The callback function accepts two parameters (newValue: new value, oldValue: old value) after the execution needs to return a value, used to replace to cache values
- * @param {function} onRequest Optional parameters，Triggered when get the data from the cache。The callback function accepts a parameter (Value: the Value in the cache) after the execution needs to return a Value to the caller
+ * @param {string|Array} path       cache data from which path
+ * @param  defaultValue             Optional parameters, the default values
+ * @param {function} onReceive      Optional parameters,Triggered when update the data in the cache。The callback function accepts two parameters (newValue: new value, oldValue: old value) after the execution needs to return a value, used to replace to cache values
+ * @param {function} onRequest      Optional parameters，Triggered when get the data from the cache。The callback function accepts a parameter (Value: the Value in the cache) after the execution needs to return a Value to the caller
  * @return {undefined}
  */
 function cache(path, defaultValue, onReceive, onRequest)
@@ -184,11 +185,11 @@ function cache(path, defaultValue, onReceive, onRequest)
 ```javascript
 /**
  * request data from cache
- * @param {string|Array} path The values of the corresponding path in the cache
- * @param {string} callback_path Want to send the data to which path
+ * @param {string|Array} path       The values of the corresponding path in the cache
+ * @param {string} callback_path    Want to send the data to which path.if ignore，callback_path equals to path
  * @return {undefined}
  */
-function requestCache(path, callback_path)
+function requestCache(path, callback_path = path)
 ```
 
 ```javascript
@@ -203,7 +204,7 @@ function getCache(path)
 ```javascript
 /**
  * set data in the cache directly
- * @param {string|Array} path  The values of the corresponding path in the cache
+ * @param {string|Array} path     The values of the corresponding path in the cache
  * @param data Data
  * @return {undefined}
  */

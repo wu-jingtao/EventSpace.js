@@ -13,6 +13,7 @@ npm install datacast --save
 `send`方法通过一个路径字符串来确定哪些接收器需要被触发。
 
 路径字符串可以有层级关系。例如`grandfather.farther.children`，中间通过`.`来进行分割。
+（也可以用数组的方式来表示，例如`['grandfather','farther','children']`）
 
 对于接收器而言，子级接收器可以收到父级发来的消息。而对于发送函数来说，父级可以向所有子级发送数据。
 
@@ -183,11 +184,11 @@ function cache(path, defaultValue, onReceive, onRequest)
 ```javascript
 /**
  * 请求cache中的数据
- * @param {string|Array} path 对应路径在缓存中的值
- * @param {string|Array} callback_path 要把数据发到哪一条路径上
+ * @param {string|Array} path 请求哪一条路径在缓存中的值
+ * @param {string|Array} callback_path 要把数据发到哪一条路径上,如果省略，则与path路径相同
  * @return {undefined}
  */
-function requestCache(path, callback_path)
+function requestCache(path, callback_path = path)
 ```
 
 ```javascript
