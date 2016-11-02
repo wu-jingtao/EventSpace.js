@@ -16,6 +16,14 @@ cache('test',undefined,(newVal,oldVal)=>{
    return '666';
 });
 
+cache('test',undefined,(newVal,oldVal)=>{
+   console.log(newVal,oldVal);
+   return 321;
+},(val)=>{
+   console.log(val);
+   return '666';
+});
+
 send('test','123');
 
 requestCache('test','test');

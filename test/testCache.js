@@ -9,6 +9,7 @@ receive('test',data=>{
 });
 
 cache('test');
+cache('test');
 
 send('test','123');
 send('test.2','321');
