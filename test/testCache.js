@@ -14,11 +14,13 @@ cache('test');
 send('test','123');
 send('test.2','321');
 
+requestCache('test');
 requestCache('test','test');
 
 /*
 * output:
 *
+* 123
 * 123
 * 123
 * */

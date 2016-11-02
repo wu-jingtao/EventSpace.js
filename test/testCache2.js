@@ -26,7 +26,7 @@ cache('test',undefined,(newVal,oldVal)=>{
 
 send('test','123');
 
-requestCache('test','test');
+requestCache('test');
 
 /*
 * output:
