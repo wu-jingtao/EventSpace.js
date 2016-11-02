@@ -134,7 +134,7 @@ To here basically finished, if it is not very clear, suggested that direct look 
 ```javascript
 /**
 * register a data receiver
-* @ param {string|Array} receive     data from which path .can be a string or array (the string through the '. 'to split level)
+* @ param {string|Array} path        receive data from which path .can be a string or array (the string through the '. 'to split level)
 * @ param {function} receiver        Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
 * @ return {function}                returns the receiver
 */
@@ -144,7 +144,7 @@ function receive(path, receiver)
 ```javascript
 /**
 * register a data receiver, which will be triggered  only once
-* @ param {string|Array} receive         data from which path .can be a string or array (the string through the '. 'to split level)
+* @ param {string|Array} path            receive data from which path .can be a string or array (the string through the '. 'to split level)
 * @ param {function} receiver            Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
 * @ return {function}                    returns the receiver
  */
