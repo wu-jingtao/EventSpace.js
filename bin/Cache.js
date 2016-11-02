@@ -39,10 +39,12 @@ function cache(path, defaultValue, onReceive, onRequest) {
 /**
  * 请求cache中的数据
  * @param {string|Array} path 请求哪一条路径在缓存中的值
- * @param {string|Array} callback_path 要把数据发到哪一条路径上
+ * @param {string|Array} callback_path 要把数据发到哪一条路径上,如果省略，则与path路径相同
  * @return {undefined}
  */
-function requestCache(path, callback_path) {
+function requestCache(path) {
+    var callback_path = arguments.length <= 1 || arguments[1] === undefined ? path : arguments[1];
+
 
     if (Array.isArray(path)) path = path.join('.');
 
