@@ -129,7 +129,8 @@ function getAllChildrenReceiver(targetLevel) {
  * @return {undefined}
  */
 function send(path, data) {
-    //验证数据类型以及分割字符串放在下面在
+ 
+    path = convertPathType(path);
 
     let level = dispatchList.children;
 
@@ -156,21 +157,6 @@ function send(path, data) {
 }
 
 module.exports = {
-    receive, receiveOnce, cancel, dispatchList,
-
-    /**
-     * send的包装方法
-     * @param path
-     * @param data
-     * @param needSendToCache   是否需要将这个数据发送给Cache（这个一般只在内部使用）
-     */
-    send(path, data, needSendToCache = true){
-
-        path = convertPathType(path);
-
-        send(path, data);
-        if (needSendToCache)
-            send(['__cache__receive', ...path], data);  //給缓存再发一份
-    }
+    receive, receiveOnce, cancel, send
 };
 
