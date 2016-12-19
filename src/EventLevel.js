@@ -14,60 +14,57 @@ function EventLevel() {
 
 /**
  * 添加接收器
- * @param {Array} nameLevel 命名等级
+ * @param {Array} levelName 等级名字数组
  * @param {function} receiver 监听器
  */
-EventLevel.prototype.addReceiver = function (nameLevel, receiver) {  //添加新的监听器
+EventLevel.prototype.addReceiver = function (levelName, receiver) {  //添加新的监听器
     if (typeof receiver !== 'function')  /*验证数据类型*/
         throw new TypeError('receiver is not a function');
 
-    var isLast = nameLevel.length === 0; //是不是最后一级了
-    var levelName = nameLevel.shift();
-
-    if (isLast)
+    if (levelName.length === 0)  //是不是最后一级了
         this.receivers.push(receiver);
     else {
-        if (!(levelName in this.children))
-            this.children[levelName] = new EventLevel();
+        var currentName = levelName.shift();
 
-        this.children[levelName].addReceiver(nameLevel, receiver);
+        if (!(currentName in this.children))
+            this.children[currentName] = new this.constructor();
+
+        this.children[currentName].addReceiver(levelName, receiver);
     }
 };
 
 /**
  * 移除指定等级的事件监听器
- * @param {Array} nameLevel 命名等级
+ * @param {Array} levelName 等级名字数组
  */
-EventLevel.prototype.removeReceiver = function (nameLevel) {
+EventLevel.prototype.removeReceiver = function (levelName) {
 
-    var isLast = nameLevel.length === 0; //是不是最后一级了
-    var levelName = nameLevel.shift();
-
-    if (isLast) {
+    if (levelName.length === 0) { //是不是最后一级了
         this.receivers = [];
         this.children = {};
     } else {
-        if (levelName in this.children)
-            this.children[levelName].removeReceiver(nameLevel);
+        var currentName = levelName.shift();
+
+        if (currentName in this.children)
+            this.children[currentName].removeReceiver(levelName);
     }
 };
 
 /**
  * 触发所有指定级别以及子级的监听器
- * @param {Array} nameLevel 命名等级
+ * @param {Array} levelName 等级名字数组
  * @param {Object} _this 指定监听器绑定的this对象
  */
-EventLevel.prototype.trigger = function (nameLevel, data, _this) {
+EventLevel.prototype.trigger = function (levelName, data, _this) {
 
-    var isLast = nameLevel.length === 0; //是不是最后一级了
-    var levelName = nameLevel.shift();
-
-    if (isLast) {
+    if (levelName.length === 0) {  //是不是最后一级了
         this.receivers.forEach(item => item.call(_this, data));
-        Object.keys(this.children).forEach(tag => this.children[tag].trigger(nameLevel, data, _this));
+        Object.keys(this.children).forEach(tag => this.children[tag].trigger(levelName, data, _this));
     } else {
-        if (levelName in this.children)
-            this.children[levelName].trigger(nameLevel, data, _this);
+        var currentName = levelName.shift();
+
+        if (currentName in this.children)
+            this.children[currentName].trigger(levelName, data, _this);
     }
 };
 
