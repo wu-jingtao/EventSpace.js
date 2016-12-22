@@ -18,8 +18,6 @@ function EventLevel() {
  * @param {function} receiver 监听器
  */
 EventLevel.prototype.addReceiver = function (levelName, receiver) {  //添加新的监听器
-    if (typeof receiver !== 'function')  /*验证数据类型*/
-        throw new TypeError('receiver is not a function');
 
     if (levelName.length === 0)  //是不是最后一级了
         this.receivers.push(receiver);

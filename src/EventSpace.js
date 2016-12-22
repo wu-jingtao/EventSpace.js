@@ -26,6 +26,9 @@ function convertPathType(path) {
  * @return {function} 返回 receiver
  */
 function receive(eventName, receiver) {
+    if (typeof receiver !== 'function')  /*验证数据类型*/
+        throw new Error('receiver is not a function');
+
     eventName = convertPathType(eventName);
 
     eventLevel.addReceiver(eventName, receiver);
@@ -44,7 +47,7 @@ function receiveOnce(eventName, receiver) {
         throw new Error('receiver is not a function');
 
     eventName = convertPathType(eventName);
-    eventName.push(Math.random().toString().split('.')[1]);  //确保只删除自身
+    eventName.push(Math.random().toString());  //确保只删除自身
 
     receive(eventName, function (d, p) {
         receiver(d, p);
