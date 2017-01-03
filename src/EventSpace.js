@@ -6,16 +6,16 @@ var eventLevel = new (require('./EventLevel'));
 
 
 /**
- * 转换路径字符串的类型
- * @param {string|Array} path
+ * 转换事件名称的类型
+ * @param {string|Array} eventName
  */
-function convertPathType(path) {
-    if (typeof path === 'string')    //验证path的数据类型
-        path = path.split('.');
-    else if (!Array.isArray(path))
-        throw new Error('path must be a string or array');
+function convertEventNameType(eventName) {
+    if (typeof eventName === 'string')    //验证eventName的数据类型
+        eventName = eventName.split('.');
+    else if (!Array.isArray(eventName))
+        throw new Error('eventName must be a string or array');
 
-    return path;
+    return eventName;
 }
 
 /**
@@ -29,7 +29,7 @@ function receive(eventName, receiver) {
     if (typeof receiver !== 'function')  /*验证数据类型*/
         throw new Error('receiver is not a function');
 
-    eventName = convertPathType(eventName);
+    eventName = convertEventNameType(eventName);
 
     eventLevel.addReceiver(eventName, receiver);
     return receiver;
@@ -46,7 +46,7 @@ function receiveOnce(eventName, receiver) {
     if (typeof receiver !== 'function')  /*验证数据类型*/
         throw new Error('receiver is not a function');
 
-    eventName = convertPathType(eventName);
+    eventName = convertEventNameType(eventName);
     eventName.push(Math.random().toString());  //确保只删除自身
 
     receive(eventName, function (d, p) {
@@ -63,7 +63,7 @@ function receiveOnce(eventName, receiver) {
  * @return {undefined}
  */
 function cancel(eventName) {
-    eventName = convertPathType(eventName);
+    eventName = convertEventNameType(eventName);
     eventLevel.removeReceiver(eventName);
 }
 
@@ -76,7 +76,7 @@ function cancel(eventName) {
  * @return {undefined}
  */
 function send(eventName, data, _this) {
-    eventName = convertPathType(eventName);
+    eventName = convertEventNameType(eventName);
     eventLevel.trigger(eventName, data, _this);
 }
 

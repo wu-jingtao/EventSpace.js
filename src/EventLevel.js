@@ -55,9 +55,14 @@ EventLevel.prototype.removeReceiver = function (levelName) {
  */
 EventLevel.prototype.trigger = function (levelName, data, _this) {
 
-    if (levelName.length === 0) {  //是不是最后一级了
-        this.receivers.forEach(item => item.call(_this, data));
-        Object.keys(this.children).forEach(tag => this.children[tag].trigger(levelName, data, _this));
+    if (levelName.length === 0) {  //是不是最后一级了,遍历当前级别和子级
+        this.receivers.forEach(function (item) {
+            item.call(_this, data);
+        });
+
+        Object.keys(this.children).forEach(function (tag) {
+            this.children[tag].trigger(levelName, data, _this);
+        }, this);
     } else {
         var currentName = levelName.shift();
 

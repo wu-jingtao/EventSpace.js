@@ -5,7 +5,7 @@
 /*测试 cancel*/
 /*父级可以删除自己和所有子级*/
 
-const {receive,send,cancel} = require('../bin/index');
+const {receive,send,cancel} = require('../src/EventSpace');
 
 receive(['test'],data=>{
     console.log('1:',data);

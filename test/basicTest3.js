@@ -5,7 +5,7 @@
 /*测试 cancel*/
 /*多次注册*/
 
-const {receive,send} = require('../bin/index');
+const {receive,send} = require('../src/EventSpace');
 
 receive('test',data=>{
     console.log('1:',data);

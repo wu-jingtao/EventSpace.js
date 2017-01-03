@@ -5,7 +5,7 @@
 /*测试 receiveOnce 和 send*/
 /*父级可以向所有子级发送数据*/
 
-const {receiveOnce,send} = require('../bin/index');
+const {receiveOnce,send} = require('../src/EventSpace');
 
 receiveOnce('test',data=>{
     console.log('1:',data);
