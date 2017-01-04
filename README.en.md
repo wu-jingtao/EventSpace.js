@@ -8,7 +8,7 @@ npm install datacast --save
 [中文](README.md)
 
 
-This is a data layer framework, works like jQuery custom events. One side to obtain data by registering a receiver ( `receive` method)
+This is a event transfer framework, works like jQuery custom events. One side to obtain data by registering a receiver ( `receive` method)
 The other side send data to a corresponding receiver by `send` methods.
 
 `Send` method by a path string to determine which receiver needs to be triggered.
@@ -52,39 +52,44 @@ send('test.2.3','c');
 
 ```javascript
 /**
-* register a data receiver
-* @ param {string|Array} path        receive data from which path .can be a string or array (the string through the '. 'to split level)
-* @ param {function} receiver        Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
-* @ return {function}                returns the receiver
-*/
-function receive(path, receiver)
-```
-
-```javascript
-/**
-* register a data receiver, which will be triggered  only once
-* @ param {string|Array} path            receive data from which path .can be a string or array (the string through the '. 'to split level)
-* @ param {function} receiver            Receives the data after the execution of the callback function, the callback function accepts two parameters (data: data, path: the path string)
-* @ return {function}                    returns the receiver
+ * register a event listener
+ * nickname on
+ * @param {string|Array} eventName   listening event name. can be a string or array (the string through the '. 'to split level)
+ * @param {function} receiver   the event listener, the callback function accepts two parameters (data: data, eventName: the path string)
+ * @return {function} returns the receiver
  */
-function receiveOnce(path, receiver)
+function receive(eventName, receiver)
 ```
 
 ```javascript
 /**
- * cancellation data receiver
- * @param {string|Array} path            cancel which path，And its children.can be a string or array(the string through the '. 'to split level)
+ * register a event listener, which will be triggered  only once
+ * nickname once
+ * @param {string|Array} eventName   listening event name. can be a string or array (the string through the '. 'to split level)
+ * @param {function} receiver   the event listener, the callback function accepts two parameters (data: data, eventName: the path string)
+ * @return {function}  returns the receiver
+ */
+function receiveOnce(eventName, receiver)
+```
+
+```javascript
+/**
+ * canceling event listener
+ * nickname off
+ * @param {string|Array} eventName   be canceled event name. can be a string or array(the string through the '. 'to split level)
  * @return {undefined}
  */
-function cancel(path)
+function cancel(eventName)
 ```
 
 ```javascript
 /**
- * Send the message to the specified path
- * @param {string|Array} path     Send data to which path.
- * @param data                    Data
+ * trigger specific event listener
+ * nickname trigger
+ * @param {string|Array} eventName   be triggered event name.can be a string or array (the string through the '. 'to split level)
+ * @param data   sending data
+ * @param _this   binding‘this’to listener
  * @return {undefined}
  */
-function send(path, data)
+function send(eventName, data, _this)
 ```
