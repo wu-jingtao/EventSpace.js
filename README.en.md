@@ -1,8 +1,8 @@
-# Datacast.js
+# EventSpace.js
 
 
 ```
-npm install datacast --save
+npm install eventspace --save
 ```
 
 [中文](README.md)
