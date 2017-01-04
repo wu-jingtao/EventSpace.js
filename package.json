@@ -1,8 +1,8 @@
 {
   "name": "eventspace",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "a event broadcast framework",
-  "main": "bin/eventspace.js",
+  "main": "src/eventspace.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mx601595686/EventSpace.js.git"
