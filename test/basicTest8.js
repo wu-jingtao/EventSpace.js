@@ -1,11 +1,10 @@
 /**
- * Created by wujingtao on 2016/10/12 0012.
+ * Created by wujingtao on 2017/1/4 0004.
  */
 
-/*测试 receiveOnce 和 send*/
-/*父级可以向所有子级发送数据*/
+/*测试 receiveOnce 和 send,off*/
 
-const {receiveOnce,send} = require('../src/EventSpace');
+const {receiveOnce,send,off} = require('../src/EventSpace');
 
 receiveOnce('test',data=>{
     console.log('1:',data);
@@ -19,6 +18,7 @@ receiveOnce('test',data=>{
     console.log('3:',data);
 });
 
+off(['test','2']);
 
 send('test', 'a');
 send('test', 'b');
@@ -27,6 +27,5 @@ send('test.2','c');
 /*
  * output:
  1: a
- 2: a [ 'test' ]
  3: a
  * */

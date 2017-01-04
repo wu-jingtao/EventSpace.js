@@ -7,16 +7,16 @@
 
 const {receive,send,cancel} = require('../src/EventSpace');
 
-receive('test',data=>{
-    console.log('1:',data);
+receive('test',(data,p)=>{
+    console.log('1:',data,p);
 });
 
-receive('test.2',data=>{
-    console.log('2:',data);
+receive('test.2',(data,p)=>{
+    console.log('2:',data,p);
 });
 
-receive('test.2.3',data=>{
-    console.log('3:',data);
+receive('test.2.3',(data,p)=>{
+    console.log('3:',data,p);
 });
 
 
@@ -29,5 +29,5 @@ send('test.2.3','c');
 /*
 * output:
 * 
-* 1: a
+* 1: a [ 'test' ]
 * */
