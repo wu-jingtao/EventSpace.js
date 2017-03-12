@@ -4,7 +4,7 @@
 
 /*测试 receiveOnce 和 send,off*/
 
-const {receiveOnce,send,off} = require('../src/EventSpace');
+const {receiveOnce,send,off} = require('../src/index');
 
 receiveOnce('test',data=>{
     console.log('1:',data);

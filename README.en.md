@@ -20,6 +20,8 @@ For the receiver, the child can receive the data from parent. For sending method
 
 E.g：
 ```javascript
+const {receive, send} = require('eventspace');
+
 receive('test',data=>{
     console.log('1:',data);
 });
@@ -53,7 +55,7 @@ send('test.2.3','c');
 ```javascript
 /**
  * register a event listener
- * nickname on
+ * alias on
  * @param {string|Array} eventName   listening event name. can be a string or array (the string through the '. 'to split level)
  * @param {function} receiver   the event listener, the callback function accepts two parameters (data: data, eventName: the path string)
  * @return {function} returns the receiver
@@ -64,7 +66,7 @@ function receive(eventName, receiver)
 ```javascript
 /**
  * register a event listener, which will be triggered  only once
- * nickname once
+ * alias once
  * @param {string|Array} eventName   listening event name. can be a string or array (the string through the '. 'to split level)
  * @param {function} receiver   the event listener, the callback function accepts two parameters (data: data, eventName: the path string)
  * @return {function}  returns the receiver
@@ -75,7 +77,7 @@ function receiveOnce(eventName, receiver)
 ```javascript
 /**
  * canceling event listener
- * nickname off
+ * alias off
  * @param {string|Array} eventName   be canceled event name. can be a string or array(the string through the '. 'to split level)
  * @return {undefined}
  */
@@ -85,7 +87,7 @@ function cancel(eventName)
 ```javascript
 /**
  * trigger specific event listener
- * nickname trigger
+ * alias trigger
  * @param {string|Array} eventName   be triggered event name.can be a string or array (the string through the '. 'to split level)
  * @param data   sending data
  * @param _this   binding‘this’to listener
@@ -93,3 +95,9 @@ function cancel(eventName)
  */
 function send(eventName, data, _this)
 ```
+```javascript
+/**
+ * EventSpace`s constructor. Can use 'new EventSpace()' to create a new eventspace object .
+ * @constructor
+ */
+function EventSpace() 

@@ -12,13 +12,15 @@ npm install eventspace --save
 
 `send`方法通过一个路径字符串来确定哪些接收器需要被触发。
 
-路径字符串可以有层级关系。例如`grandfather.farther.children`，中间通过`.`来进行分割。
+路径可以有层级关系。例如`grandfather.farther.children`，中间通过` . `来进行分割。
 （也可以用数组的方式来表示，例如`['grandfather','farther','children']`）
 
 对于接收器而言，子级接收器可以收到父级发来的消息。而对于发送函数来说，父级可以向所有子级发送数据。
 
 例如：
 ```javascript
+const {receive, send} = require('eventspace');
+
 receive('test',data=>{
     console.log('1:',data);
 });
@@ -92,4 +94,12 @@ function cancel(eventName)
  * @return {undefined}
  */
 function send(eventName, data, _this)
+```
+
+```javascript
+/**
+ * 事件空间的构造方法。可以通过new EventSpace() 来创建一个新的事件空间对象。
+ * @constructor
+ */
+function EventSpace() 
 ```

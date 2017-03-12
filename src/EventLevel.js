@@ -2,7 +2,6 @@
  * Created by wujingtao on 2016/12/17 0017.
  */
 
-//
 /**
  * 事件等级类
  * @constructor

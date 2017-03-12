@@ -2,7 +2,7 @@
  * Created by wujingtao on 2016/12/17 0017.
  */
 
-var eventLevel = new (require('./EventLevel'));
+var EventLevel = require('./EventLevel');
 
 
 /**
@@ -31,7 +31,7 @@ function receive(eventName, receiver) {
 
     eventName = convertEventNameType(eventName);
 
-    eventLevel.addReceiver(eventName, receiver);
+    this.eventLevel.addReceiver(eventName, receiver);
     return receiver;
 }
 
@@ -49,10 +49,10 @@ function receiveOnce(eventName, receiver) {
     eventName = convertEventNameType(eventName);
     eventName.push(Math.random().toString());  //确保只删除自身
 
-    receive(eventName, function (d, p) {
+    this.receive(eventName, function (d, p) {
         receiver(d, p);
-        cancel(eventName);
-    });
+        this.cancel(eventName);
+    }.bind(this));
     return receiver;
 }
 
@@ -64,7 +64,7 @@ function receiveOnce(eventName, receiver) {
  */
 function cancel(eventName) {
     eventName = convertEventNameType(eventName);
-    eventLevel.removeReceiver(eventName);
+    this.eventLevel.removeReceiver(eventName);
 }
 
 /**
@@ -77,19 +77,21 @@ function cancel(eventName) {
  */
 function send(eventName, data, _this) {
     eventName = convertEventNameType(eventName);
-    eventLevel.trigger(eventName, data, _this);
+    this.eventLevel.trigger(eventName, data, _this);
 }
 
-module.exports = {
-    receive,
-    on: receive,
 
-    receiveOnce,
-    once: receiveOnce,
+/**
+ * 对EventLevel的简易封装
+ * @constructor
+ */
+function EventSpace() {
+    this.eventLevel = new EventLevel();
 
-    send,
-    trigger: send,
+    this.on = this.receive = receive.bind(this);
+    this.once = this.receiveOnce = receiveOnce.bind(this);
+    this.off = this.cancel = cancel.bind(this);
+    this.trigger = this.send = send.bind(this);
+}
 
-    cancel,
-    off: cancel
-};
+module.exports = EventSpace;

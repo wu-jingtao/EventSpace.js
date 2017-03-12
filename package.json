@@ -1,8 +1,8 @@
 {
   "name": "eventspace",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "a event broadcast framework",
-  "main": "src/eventspace.js",
+  "main": "src/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mx601595686/EventSpace.js.git"
@@ -18,13 +18,5 @@
   "bugs": {
     "url": "https://github.com/mx601595686/EventSpace.js/issues"
   },
-  "homepage": "https://github.com/mx601595686/EventSpace.js#readme",
-  "devDependencies": {
-    "babel-core": "^6.10.4",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-stage-0": "^6.5.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2"
-  }
+  "homepage": "https://github.com/mx601595686/EventSpace.js#readme"
 }
