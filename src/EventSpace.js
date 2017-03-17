@@ -9,7 +9,7 @@ var EventLevel = require('./EventLevel');
  * 转换事件名称的类型
  * @param {string|Array} eventName
  */
-function convertEventNameType(eventName) {
+function convertEventNameType(eventName = []) {
     if (typeof eventName === 'string')    //验证eventName的数据类型
         eventName = eventName.split('.');
     else if (!Array.isArray(eventName))

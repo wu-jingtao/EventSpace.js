@@ -1,6 +1,6 @@
 {
   "name": "eventspace",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "a event broadcast framework",
   "main": "src/index.js",
   "repository": {
@@ -18,5 +18,16 @@
   "bugs": {
     "url": "https://github.com/mx601595686/EventSpace.js/issues"
   },
-  "homepage": "https://github.com/mx601595686/EventSpace.js#readme"
+  "homepage": "https://github.com/mx601595686/EventSpace.js#readme",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
+  "devDependencies": {
+    "@types/expect.js": "^0.3.29",
+    "@types/lodash": "^4.14.55",
+    "@types/mocha": "^2.2.40",
+    "expect.js": "^0.3.1",
+    "lodash": "^4.17.4",
+    "mocha": "^3.2.0"
+  }
 }
