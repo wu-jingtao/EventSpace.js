@@ -53,12 +53,47 @@ describe('test', function () {
             send('test.2.3', 'c');
         });
 
-        it('test number event name', function (done) {
+        it('test number event name', function () {
+            let cycle = 0;
+
             receive(1, data => {
-                expect(data).to.be.equal('a');
-                done();
+                if (cycle === 0) {
+                    expect(data).to.be.equal('a');
+                } else {
+                    expect().fail(`"test" can\`t be triggered in cycle ${cycle}`);
+                }
             });
+
+            receive('1.2', data => {
+                if (cycle === 0) {
+                    expect(data).to.be.equal('a');
+                } else if (cycle === 1) {
+                    expect(data).to.be.equal('b');
+                } else {
+                    expect().fail(`"test.2" can\`t be triggered in cycle ${cycle}`);
+                }
+            });
+
+            receive([1, 2, 3], (data, path) => {
+                if (cycle === 0) {
+                    expect(data).to.be.equal('a');
+                    expect(_.isEqual(path, [1])).to.be.ok();
+                } else if (cycle === 1) {
+                    expect(data).to.be.equal('b');
+                    expect(_.isEqual(path, [1, 2])).to.be.ok();
+                } else {
+                    expect(data).to.be.equal('c');
+                    expect(_.isEqual(path, [1, 2, 3])).to.be.ok();
+                }
+            });
+
             send(1, 'a');
+            cycle++;
+
+            send([1, 2], 'b');
+            cycle++;
+
+            send([1, 2, 3], 'c');
         });
 
         it('test event level. Using array', function () {
