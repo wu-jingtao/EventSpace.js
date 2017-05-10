@@ -1,6 +1,6 @@
 const expect = require('expect.js');
 const _ = require('lodash');
-const { receive, send, cancel, receiveOnce, EventSpace } = require('../src/index');
+const { receive, send, cancel, receiveOnce, EventSpace } = require('../bin/index');
 
 describe('test', function () {
 
@@ -53,7 +53,15 @@ describe('test', function () {
             send('test.2.3', 'c');
         });
 
-        it('test event level.Using array', function () {
+        it('test number event name', function (done) {
+            receive(1, data => {
+                expect(data).to.be.equal('a');
+                done();
+            });
+            send(1, 'a');
+        });
+
+        it('test event level. Using array', function () {
             let cycle = 0;
 
             receive(['test'], data => {
