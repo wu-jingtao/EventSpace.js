@@ -1,0 +1,5 @@
+"use strict";
+const EventSpace_1 = require("./EventSpace");
+module.exports = new EventSpace_1.default();
+
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImluZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFJQSw2Q0FBc0M7QUFDdEMsaUJBQVMsSUFBSSxvQkFBVSxFQUFFLENBQUMiLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcclxuICogQ3JlYXRlZCBieSDlkLTlirLpn6wgb24gMjAxNy8zLzEyLlxyXG4gKi9cclxuXHJcbmltcG9ydCBFdmVudFNwYWNlIGZyb20gJy4vRXZlbnRTcGFjZSc7XHJcbmV4cG9ydCA9IG5ldyBFdmVudFNwYWNlKCk7XHJcbiJdfQ==

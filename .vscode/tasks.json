@@ -7,6 +7,10 @@
         {
             "taskName": "test",
             "command": "npm run test"
+        },
+        {
+            "taskName": "compile",
+            "command": "npm run compile"
         }
     ]
 }
