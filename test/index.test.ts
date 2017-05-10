@@ -1,6 +1,7 @@
-const expect = require('expect.js');
-const _ = require('lodash');
-const { receive, send, cancel, receiveOnce, EventSpace } = require('../bin/index');
+import expect = require('expect.js');
+import _ = require('lodash');
+import es = require('../bin/index');
+const { receive, send, cancel, receiveOnce, EventSpace } = es;
 
 describe('test', function () {
 
@@ -13,7 +14,7 @@ describe('test', function () {
         it('test event level', function () {
             let cycle = 0;
 
-            receive('test', data => {
+            receive('test', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -21,7 +22,7 @@ describe('test', function () {
                 }
             });
 
-            receive('test.2', data => {
+            receive('test.2', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -31,7 +32,7 @@ describe('test', function () {
                 }
             });
 
-            receive('test.2.3', (data, path) => {
+            receive('test.2.3', (data: any, path: any[]) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                     expect(_.isEqual(path, ['test'])).to.be.ok();
@@ -56,7 +57,7 @@ describe('test', function () {
         it('test number event name', function () {
             let cycle = 0;
 
-            receive(1, data => {
+            receive(1, (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -64,7 +65,7 @@ describe('test', function () {
                 }
             });
 
-            receive('1.2', data => {
+            receive('1.2', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -74,7 +75,7 @@ describe('test', function () {
                 }
             });
 
-            receive([1, 2, 3], (data, path) => {
+            receive([1, 2, 3], (data: any, path: any[]) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                     expect(_.isEqual(path, [1])).to.be.ok();
@@ -99,7 +100,7 @@ describe('test', function () {
         it('test event level. Using array', function () {
             let cycle = 0;
 
-            receive(['test'], data => {
+            receive(['test'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -107,7 +108,7 @@ describe('test', function () {
                 }
             });
 
-            receive(['test', '2'], data => {
+            receive(['test', '2'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -117,7 +118,7 @@ describe('test', function () {
                 }
             });
 
-            receive(['test', '2', '3'], data => {
+            receive(['test', '2', '3'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -138,15 +139,15 @@ describe('test', function () {
 
         it('test cancel', function () {
 
-            receive('test', data => {
+            receive('test', (data: any) => {
                 expect(data).to.be.equal('a');
             });
 
-            receive('test.2', data => {
+            receive('test.2', (data: any) => {
                 expect().fail(`"test.2" can\`t be triggered`);
             });
 
-            receive('test.2.3', data => {
+            receive('test.2.3', (data: any) => {
                 expect().fail(`"test.2.3" can\`t be triggered`);
             });
 
@@ -159,15 +160,15 @@ describe('test', function () {
 
         it('test cancel.Using array', function () {
 
-            receive(['test'], data => {
+            receive(['test'], (data: any) => {
                 expect(data).to.be.equal('a');
             });
 
-            receive(['test', '2'], data => {
+            receive(['test', '2'], (data: any) => {
                 expect().fail(`"test.2" can\`t be triggered`);
             });
 
-            receive(['test', '2', '3'], data => {
+            receive(['test', '2', '3'], (data: any) => {
                 expect().fail(`"test.2.3" can\`t be triggered`);
             });
 
@@ -181,7 +182,7 @@ describe('test', function () {
         it('test multi register', function () {
             let cycle = 0;
 
-            receive('test', data => {
+            receive('test', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -189,7 +190,7 @@ describe('test', function () {
                 }
             });
 
-            receive('test', data => {
+            receive('test', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -197,7 +198,7 @@ describe('test', function () {
                 }
             });
 
-            receive('test.2', data => {
+            receive('test.2', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -219,7 +220,7 @@ describe('test', function () {
         it('test multi register.Using array', function () {
             let cycle = 0;
 
-            receive(['test'], data => {
+            receive(['test'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -227,7 +228,7 @@ describe('test', function () {
                 }
             });
 
-            receive(['test'], data => {
+            receive(['test'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -235,7 +236,7 @@ describe('test', function () {
                 }
             });
 
-            receive(['test', '2'], data => {
+            receive(['test', '2'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -255,17 +256,17 @@ describe('test', function () {
         });
 
         it('test receiveOnce', function () {
-            receiveOnce('test', (data, p) => {
+            receiveOnce('test', (data: any, p: any[]) => {
                 expect(data).to.be.equal('a');
                 expect(_.isEqual(p, ['test'])).to.be.ok();
             });
 
-            receiveOnce('test.2', (data, p) => {
+            receiveOnce('test.2', (data: any, p: any[]) => {
                 expect(data).to.be.equal('a');
                 expect(_.isEqual(p, ['test'])).to.be.ok();
             });
 
-            receiveOnce('test', data => {
+            receiveOnce('test', (data: any) => {
                 expect(data).to.be.equal('a');
             });
 
@@ -275,16 +276,16 @@ describe('test', function () {
         });
 
         it('test cancel and receiveOnce', function () {
-            receiveOnce('test', (data, p) => {
+            receiveOnce('test', (data: any, p: any[]) => {
                 expect(data).to.be.equal('a');
                 expect(_.isEqual(p, ['test'])).to.be.ok();
             });
 
-            receiveOnce('test.2', (data, p) => {
+            receiveOnce('test.2', (data: any, p: any[]) => {
                 expect().fail(`this level can\`t be triggered`);
             });
 
-            receiveOnce('test', data => {
+            receiveOnce('test', (data: any) => {
                 expect(data).to.be.equal('a');
             });
 
@@ -302,7 +303,7 @@ describe('test', function () {
             const eventspace = new EventSpace();
             let cycle = 0;
 
-            eventspace.receive('test', data => {
+            eventspace.receive('test', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -310,7 +311,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive('test.2', data => {
+            eventspace.receive('test.2', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -320,7 +321,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive('test.2.3', (data, path) => {
+            eventspace.receive('test.2.3', (data: any, path: any[]) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                     expect(_.isEqual(path, ['test'])).to.be.ok();
@@ -346,7 +347,7 @@ describe('test', function () {
             const eventspace = new EventSpace();
             let cycle = 0;
 
-            eventspace.receive(['test'], data => {
+            eventspace.receive(['test'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -354,7 +355,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive(['test', '2'], data => {
+            eventspace.receive(['test', '2'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -364,7 +365,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive(['test', '2', '3'], data => {
+            eventspace.receive(['test', '2', '3'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -386,15 +387,15 @@ describe('test', function () {
         it('test cancel', function () {
             const eventspace = new EventSpace();
 
-            eventspace.receive('test', data => {
+            eventspace.receive('test', (data: any) => {
                 expect(data).to.be.equal('a');
             });
 
-            eventspace.receive('test.2', data => {
+            eventspace.receive('test.2', (data: any) => {
                 expect().fail(`"test.2" can\`t be triggered`);
             });
 
-            eventspace.receive('test.2.3', data => {
+            eventspace.receive('test.2.3', (data: any) => {
                 expect().fail(`"test.2.3" can\`t be triggered`);
             });
 
@@ -408,15 +409,15 @@ describe('test', function () {
         it('test cancel.Using array', function () {
             const eventspace = new EventSpace();
 
-            eventspace.receive(['test'], data => {
+            eventspace.receive(['test'], (data: any) => {
                 expect(data).to.be.equal('a');
             });
 
-            eventspace.receive(['test', '2'], data => {
+            eventspace.receive(['test', '2'], (data: any) => {
                 expect().fail(`"test.2" can\`t be triggered`);
             });
 
-            eventspace.receive(['test', '2', '3'], data => {
+            eventspace.receive(['test', '2', '3'], (data: any) => {
                 expect().fail(`"test.2.3" can\`t be triggered`);
             });
 
@@ -431,7 +432,7 @@ describe('test', function () {
             const eventspace = new EventSpace();
             let cycle = 0;
 
-            eventspace.receive('test', data => {
+            eventspace.receive('test', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -439,7 +440,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive('test', data => {
+            eventspace.receive('test', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -447,7 +448,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive('test.2', data => {
+            eventspace.receive('test.2', (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -470,7 +471,7 @@ describe('test', function () {
             const eventspace = new EventSpace();
             let cycle = 0;
 
-            eventspace.receive(['test'], data => {
+            eventspace.receive(['test'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -478,7 +479,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive(['test'], data => {
+            eventspace.receive(['test'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else {
@@ -486,7 +487,7 @@ describe('test', function () {
                 }
             });
 
-            eventspace.receive(['test', '2'], data => {
+            eventspace.receive(['test', '2'], (data: any) => {
                 if (cycle === 0) {
                     expect(data).to.be.equal('a');
                 } else if (cycle === 1) {
@@ -508,17 +509,17 @@ describe('test', function () {
         it('test receiveOnce', function () {
             const eventspace = new EventSpace();
 
-            eventspace.receiveOnce('test', (data, p) => {
+            eventspace.receiveOnce('test', (data: any, p: any[]) => {
                 expect(data).to.be.equal('a');
                 expect(_.isEqual(p, ['test'])).to.be.ok();
             });
 
-            eventspace.receiveOnce('test.2', (data, p) => {
+            eventspace.receiveOnce('test.2', (data: any, p: any[]) => {
                 expect(data).to.be.equal('a');
                 expect(_.isEqual(p, ['test'])).to.be.ok();
             });
 
-            eventspace.receiveOnce('test', data => {
+            eventspace.receiveOnce('test', (data: any) => {
                 expect(data).to.be.equal('a');
             });
 
@@ -530,16 +531,16 @@ describe('test', function () {
         it('test cancel and receiveOnce', function () {
             const eventspace = new EventSpace();
 
-            eventspace.receiveOnce('test', (data, p) => {
+            eventspace.receiveOnce('test', (data: any, p: any[]) => {
                 expect(data).to.be.equal('a');
                 expect(_.isEqual(p, ['test'])).to.be.ok();
             });
 
-            eventspace.receiveOnce('test.2', (data, p) => {
+            eventspace.receiveOnce('test.2', (data: any, p: any[]) => {
                 expect().fail(`this level can\`t be triggered`);
             });
 
-            eventspace.receiveOnce('test', data => {
+            eventspace.receiveOnce('test', (data: any) => {
                 expect(data).to.be.equal('a');
             });
 

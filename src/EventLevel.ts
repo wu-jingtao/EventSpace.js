@@ -57,7 +57,7 @@ export default class EventLevel {
      * 
      * @memberof EventLevel
      */
-    trigger(levelNameArray: any[], data: any, _this: Object, __originalLevelName?: any[]) {
+    trigger(levelNameArray: any[], data: any, _this?: Object, __originalLevelName?: any[]) {
 
         if (__originalLevelName === undefined)  //保留一个原始的levelName
             __originalLevelName = Array.from(levelNameArray);

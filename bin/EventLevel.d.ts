@@ -3,5 +3,5 @@ export default class EventLevel {
     children: Map<any, EventLevel>;
     addReceiver(levelNameArray: any[], receiver: Function): void;
     removeReceiver(levelNameArray: any[]): void;
-    trigger(levelNameArray: any[], data: any, _this: Object, __originalLevelName?: any[]): void;
+    trigger(levelNameArray: any[], data: any, _this?: Object, __originalLevelName?: any[]): void;
 }

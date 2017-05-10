@@ -5,9 +5,9 @@ declare var _default: {
     receive: (eventName: any, receiver: Function) => Function;
     once: (eventName: any, receiver: Function) => Function;
     receiveOnce: (eventName: any, receiver: Function) => Function;
-    off: (eventName: any) => undefined;
-    cancel: (eventName: any) => undefined;
-    trigger: (eventName: any, data: any, _this: Object) => undefined;
-    send: (eventName: any, data: any, _this: Object) => undefined;
+    off: (eventName?: any) => undefined;
+    cancel: (eventName?: any) => undefined;
+    trigger: (eventName: any, data: any, _this?: Object) => undefined;
+    send: (eventName: any, data: any, _this?: Object) => undefined;
 };
 export = _default;

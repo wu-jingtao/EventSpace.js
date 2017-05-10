@@ -28,6 +28,7 @@ export default class EventSpace {
      * @param {function} receiver 接收到事件后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
      * @return {function} 返回 receiver
      */
+    on = this.receive;
     receive(eventName: any | any[], receiver: Function) {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
@@ -45,6 +46,7 @@ export default class EventSpace {
      * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
      * @return {function} 返回 receiver
      */
+    once = this.receiveOnce;
     receiveOnce(eventName: any | any[], receiver: Function) {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
@@ -65,7 +67,8 @@ export default class EventSpace {
      * @param {any | any[]} eventName 注销事件接收器的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      * @return {undefined}
      */
-    cancel(eventName: any | any[]) {
+    off = this.cancel;
+    cancel(eventName?: any | any[]) {
         eventName = convertEventNameType(eventName);
         this.eventLevel.removeReceiver(eventName);
     }
@@ -78,7 +81,8 @@ export default class EventSpace {
      * @param {Object} _this 要为监听器绑定的this对象
      * @return {undefined}
      */
-    send(eventName: any | any[], data: any, _this: Object) {
+    trigger = this.send;
+    send(eventName: any | any[], data: any, _this?: Object) {
         eventName = convertEventNameType(eventName);
         this.eventLevel.trigger(eventName, data, _this);
     }
