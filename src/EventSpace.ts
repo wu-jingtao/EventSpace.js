@@ -18,7 +18,6 @@ function convertEventNameType(eventName: any | any[] = []): any[] {
 
 export default class EventSpace {
 
-    //导出一个全局事件空间和一个事件空间类
     private readonly eventLevel = new EventLevel();
 
     /**
@@ -28,8 +27,7 @@ export default class EventSpace {
      * @param {function} receiver 接收到事件后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
      * @return {function} 返回 receiver
      */
-    on = this.receive;
-    receive(eventName: any | any[], receiver: Function) {
+    receive = (eventName: any | any[], receiver: Function) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
 
@@ -38,6 +36,7 @@ export default class EventSpace {
         this.eventLevel.addReceiver(eventName, receiver);
         return receiver;
     }
+    on = this.receive;
 
     /**
      * 注册只接收一次的事件监听器
@@ -46,8 +45,7 @@ export default class EventSpace {
      * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
      * @return {function} 返回 receiver
      */
-    once = this.receiveOnce;
-    receiveOnce(eventName: any | any[], receiver: Function) {
+    receiveOnce = (eventName: any | any[], receiver: Function) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
 
@@ -60,6 +58,7 @@ export default class EventSpace {
         }.bind(this));
         return receiver;
     }
+    once = this.receiveOnce;
 
     /**
      * 注销数据接收器
@@ -67,11 +66,11 @@ export default class EventSpace {
      * @param {any | any[]} eventName 注销事件接收器的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      * @return {undefined}
      */
-    off = this.cancel;
-    cancel(eventName?: any | any[]) {
+    cancel = (eventName?: any | any[]) => {
         eventName = convertEventNameType(eventName);
         this.eventLevel.removeReceiver(eventName);
     }
+    off = this.cancel;
 
     /**
      * 触发指定的事件接收器
@@ -81,9 +80,9 @@ export default class EventSpace {
      * @param {Object} _this 要为监听器绑定的this对象
      * @return {undefined}
      */
-    trigger = this.send;
-    send(eventName: any | any[], data: any, _this?: Object) {
+    send = (eventName: any | any[], data: any, _this?: Object) => {
         eventName = convertEventNameType(eventName);
         this.eventLevel.trigger(eventName, data, _this);
     }
+    trigger = this.send;
 }
