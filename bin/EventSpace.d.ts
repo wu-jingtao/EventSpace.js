@@ -6,6 +6,6 @@ export default class EventSpace {
     once: (eventName: any, receiver: Function) => Function;
     cancel: (eventName?: any) => void;
     off: (eventName?: any) => void;
-    send: (eventName: any, data: any, _this?: Object) => void;
-    trigger: (eventName: any, data: any, _this?: Object) => void;
+    send: (eventName: any, data: any, _this_?: Object) => void;
+    trigger: (eventName: any, data: any, _this_?: Object) => void;
 }

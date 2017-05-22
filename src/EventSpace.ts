@@ -77,12 +77,12 @@ export default class EventSpace {
      * 别名 trigger
      * @param {any | any[]} eventName 要触发的事件名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param {any} data 要发送的数据
-     * @param {Object} _this 要为监听器绑定的this对象
+     * @param {Object} _this_ 要为监听器绑定的this对象
      * @return {undefined}
      */
-    send = (eventName: any | any[], data: any, _this?: Object) => {
+    send = (eventName: any | any[], data: any, _this_?: Object) => {
         eventName = convertEventNameType(eventName);
-        this.eventLevel.trigger(eventName, data, _this);
+        this.eventLevel.trigger(eventName, data, _this_);
     }
     trigger = this.send;
 }
