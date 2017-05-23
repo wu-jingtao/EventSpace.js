@@ -7,7 +7,7 @@ npm install eventspace --save
 
 [中文](README.md)
 
-Browser version [download](bin/browser/index.js)
+>Browser version [*download*](bin/browser/index.js)。Entry is exposed at `window.es`
 
 This is a event transfer framework, works like jQuery custom events. One side to obtain data by registering a receiver ( `receive` method)
 The other side send data to a corresponding receiver by `send` methods.

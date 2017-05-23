@@ -6,7 +6,7 @@ npm install eventspace --save
 
 [English](README.en.md)
 
-浏览器版本[下载](bin/browser/index.js)
+>浏览器版本[*下载*](bin/browser/index.js)。入口暴露在`window.es`。
 
 这是一个事件消息传输框架，工作方式类似于jQuery的自定义事件。一边通过注册接收器(`receive`方法)来获取数据
 ，另一边通过`send`方法来向对应的接收器发送数据。
