@@ -16,7 +16,19 @@ function convertEventNameType(eventName: any | any[] = []): any[] {
     return eventName;
 }
 
-export default class EventSpace {
+//用于方便手工编写浏览器版声明文件
+export interface EventSpaceStructure {
+    on: (eventName: any | any[], receiver: Function) => Function;
+    receive: (eventName: any | any[], receiver: Function) => Function;
+    once: (eventName: any | any[], receiver: Function) => Function;
+    receiveOnce: (eventName: any | any[], receiver: Function) => Function;
+    off: (eventName?: any | any[]) => void;
+    cancel: (eventName?: any | any[]) => void;
+    trigger: (eventName: any | any[], data: any, _this_?: Object) => void;
+    send: (eventName: any | any[], data: any, _this_?: Object) => void;
+}
+
+export default class EventSpace implements EventSpaceStructure {
 
     private readonly eventLevel = new EventLevel();
 
