@@ -1,10 +1,15 @@
 /**
+ * 接收器类型
+ */
+export type receiverType = (data?: any, eventName?: any[]) => any;
+
+/**
  * 事件等级类
  * @constructor
  */
 export default class EventLevel {
 
-    receivers: Function[] = []; //当前层级的接收器
+    receivers: receiverType[] = []; //当前层级的接收器
     children = new Map<any, EventLevel>();   //子层级
 
     /**
@@ -15,7 +20,7 @@ export default class EventLevel {
      * 
      * @memberof EventLevel
      */
-    addReceiver(levelNameArray: any[], receiver: Function) {  //添加新的监听器
+    addReceiver(levelNameArray: any[], receiver: receiverType) {  //添加新的监听器
         if (levelNameArray.length === 0)  //是不是最后一级了
             this.receivers.push(receiver);
         else {

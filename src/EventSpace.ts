@@ -1,4 +1,6 @@
-import EventLevel from "./EventLevel";
+import EventLevel, { receiverType } from "./EventLevel";
+
+
 
 /**
  * 根据规则将事件名转换成数组的形式
@@ -18,10 +20,10 @@ function convertEventNameType(eventName: any | any[] = []): any[] {
 
 //用于方便手工编写浏览器版声明文件
 export interface EventSpaceStructure {
-    on: (eventName: any | any[], receiver: Function) => Function;
-    receive: (eventName: any | any[], receiver: Function) => Function;
-    once: (eventName: any | any[], receiver: Function) => Function;
-    receiveOnce: (eventName: any | any[], receiver: Function) => Function;
+    on: (eventName: any | any[], receiver: receiverType) => receiverType;
+    receive: (eventName: any | any[], receiver: receiverType) => receiverType;
+    once: (eventName: any | any[], receiver: receiverType) => receiverType;
+    receiveOnce: (eventName: any | any[], receiver: receiverType) => receiverType;
     off: (eventName?: any | any[]) => void;
     cancel: (eventName?: any | any[]) => void;
     trigger: (eventName: any | any[], data: any, _this_?: Object) => void;
@@ -39,7 +41,7 @@ export default class EventSpace implements EventSpaceStructure {
      * @param {function} receiver 接收到事件后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
      * @return {function} 返回 receiver
      */
-    receive = (eventName: any | any[], receiver: Function) => {
+    receive = (eventName: any | any[], receiver: receiverType) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
 
@@ -57,7 +59,7 @@ export default class EventSpace implements EventSpaceStructure {
      * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
      * @return {function} 返回 receiver
      */
-    receiveOnce = (eventName: any | any[], receiver: Function) => {
+    receiveOnce = (eventName: any | any[], receiver: receiverType) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
 
