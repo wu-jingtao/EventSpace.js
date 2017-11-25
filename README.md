@@ -6,10 +6,6 @@ npm install eventspace --save
 
 [English](README.en.md)
 
->浏览器版本[*下载*](bin/browser/index.js)。入口暴露在`window.es`。
-
->Typescript 定义文件 [*下载*](bin/browser/index.d.ts)
-
 这是一个事件消息传输框架，工作方式类似于jQuery的自定义事件。一边通过注册接收器(`receive`方法)来获取数据
 ，另一边通过`send`方法来向对应的接收器发送数据。
 
@@ -51,58 +47,4 @@ send('test.2.3','c');
 * */
 ```
 
-
-### API
-
-
-```javascript
-/**
- * 注册事件监听器
- * 别名 on
- * @param {string|Array} eventName 接收事件的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
- * @param {function} receiver 接收到事件后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
- * @return {function} 返回 receiver
- */
-function receive(eventName, receiver)
-```
-
-```javascript
-/**
- * 注册只接收一次的事件监听器
- * 别名 once
- * @param {string|Array} eventName 接收事件的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
- * @param {function} receiver 接收到数据后执行的回调函数 ,回调函数接受两个参数（data:数据，eventName:事件的名称数组）
- * @return {function} 返回 receiver
- */
-function receiveOnce(eventName, receiver)
-```
-
-```javascript
-/**
- * 注销数据接收器
- * 别名 off
- * @param {string|Array} eventName 注销事件接收器的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
- * @return {undefined}
- */
-function cancel(eventName)
-```
-
-```javascript
-/**
- * 触发指定的事件接收器
- * 别名 trigger
- * @param {string|Array} eventName 要触发的事件名称.可以为字符串或数组(字符串通过‘.’来分割层级)
- * @param data 要发送的数据
- * @param _this 要为监听器绑定的this对象
- * @return {undefined}
- */
-function send(eventName, data, _this)
-```
-
-```javascript
-/**
- * 事件空间的构造方法。可以通过new EventSpace() 来创建一个新的事件空间对象。
- * @constructor
- */
-function EventSpace() 
-```
+### [API](./bin/EventSpace.d.ts)
