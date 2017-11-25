@@ -11,10 +11,6 @@
         {
             "taskName": "compile",
             "command": "npm run compile"
-        },
-        {
-            "taskName": "package",
-            "command": "npm run package"
         }
     ]
 }

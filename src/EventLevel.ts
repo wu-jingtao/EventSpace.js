@@ -1,85 +1,92 @@
 /**
- * 接收器类型
+ * 接收器回调函数
  */
-export type receiverType = (data?: any, eventName?: any[]) => any;
+export type receiver = (data?: any, eventName?: string[]) => void;
 
 /**
- * 事件等级类
- * @constructor
+ * 事件层级类
  */
-export default class EventLevel {
+export class EventLevel {
 
-    receivers: receiverType[] = []; //当前层级的接收器
-    children = new Map<any, EventLevel>();   //子层级
+    private readonly _receivers: receiver[] = []; //当前层级的接收器
+    private readonly _children = new Map<string, EventLevel>();   //子层级, key:子层级名称
 
     /**
      * 添加接收器
-     * 
-     * @param {any[]} levelNameArray 事件等级名字数组
-     * @param {Function} receiver 监听器
-     * 
-     * @memberof EventLevel
+     * @param levelNameArray 事件层级名字数组
+     * @param receiver 监听器
      */
-    addReceiver(levelNameArray: any[], receiver: receiverType) {  //添加新的监听器
-        if (levelNameArray.length === 0)  //是不是最后一级了
-            this.receivers.push(receiver);
-        else {
-            var currentName = levelNameArray.shift();
-            if (!this.children.has(currentName))
-                this.children.set(currentName, new EventLevel());
+    addReceiver(levelNameArray: string[], receiver: receiver) {  //添加新的监听器
+        let level: EventLevel = this;   //查询到的对应层级
 
-            this.children.get(currentName).addReceiver(levelNameArray, receiver);
+        for (const currentName of levelNameArray) {
+            const nextLevel = level._children.get(currentName);
+            if (nextLevel === undefined) {
+                level = new EventLevel();
+                level._children.set(currentName, level);
+            } else {
+                level = nextLevel;
+            }
+        }
+
+        level._receivers.push(receiver);
+    }
+
+    /**
+     * 移除指定层级的事件监听器
+     * @param levelNameArray 层级名字数组
+     */
+    removeReceiver(levelNameArray: string[]) {
+        let level: EventLevel = this;   //查询到的对应层级
+
+        for (const item of levelNameArray) {
+            level = level._children.get(item);
+            if (level === undefined) break;
+        }
+
+        if (level !== undefined) {
+            this._receivers.length = 0;
+            this._children.clear();
         }
     }
 
     /**
-     * 移除指定等级的事件监听器
-     * 
-     * @param {any[]} levelNameArray 等级名字数组
-     * 
-     * @memberof EventLevel
+     * 判定在指定的事件层级下是否绑定的有监听器
+     * @param levelNameArray 层级名字数组
      */
-    removeReceiver(levelNameArray: any[]) {
+    hasReceiver(levelNameArray: string[]): boolean {
+        let level: EventLevel = this;   //查询到的对应层级
 
-        if (levelNameArray.length === 0) { //是不是最后一级了
-            this.receivers = [];
-            this.children.clear();
+        for (const item of levelNameArray) {
+            level = level._children.get(item);
+            if (level === undefined) break;
+        }
+
+        if (level !== undefined) {
+            return this._receivers.length > 0 || this._children.size > 0;
         } else {
-            var currentName = levelNameArray.shift();
-
-            if (this.children.has(currentName))
-                this.children.get(currentName).removeReceiver(levelNameArray);
+            return false;
         }
     }
 
     /**
      * 触发所有指定级别以及子级的监听器
-     * 
-     * @param {any[]} levelNameArray 等级名字数组
-     * @param {*} data 要给触发的方法传递的数据
-     * @param {Object} _this 指定监听器绑定的this对象
-     * @param {eventname[]} __originalLevelName 内部使用的，保留一个原始的levelName
-     * 
-     * @memberof EventLevel
+     * @param levelNameArray 事件层级名字数组
+     * @param data 要给触发的方法传递的数据
      */
-    trigger(levelNameArray: any[], data: any, _this?: Object, __originalLevelName?: any[]) {
-
-        if (__originalLevelName === undefined)  //保留一个原始的levelName
-            __originalLevelName = Array.from(levelNameArray);
-
+    trigger(levelNameArray: string[], data: any) {
         if (levelNameArray.length === 0) {  //是不是最后一级了,遍历当前级别和子级
-            this.receivers.forEach(function (item) {
-                item.call(_this, data, __originalLevelName);
+            this._receivers.forEach(function (item) {
+                item(data);
             });
 
-            this.children.forEach(function (child) {
-                child.trigger(levelNameArray, data, _this, __originalLevelName);
+            this._children.forEach(function (child) {
+                child.trigger(levelNameArray, data);
             });
         } else {
-            var currentName = levelNameArray.shift();
-
-            if (this.children.has(currentName))
-                this.children.get(currentName).trigger(levelNameArray, data, _this, __originalLevelName);
+            const currentName = levelNameArray.shift();
+            const level = this._children.get(currentName);
+            if (level !== undefined) level.trigger(levelNameArray, data);
         }
     };
 }
