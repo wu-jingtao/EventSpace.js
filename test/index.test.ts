@@ -6,16 +6,13 @@ const { receive, send, cancel, receiveOnce, EventSpace } = es;
 /** 最近一次测试结果
   test global event space
     √ test event level
-    √ test event level. Using array
     √ test cancel
-    √ test cancel.Using array
     √ test multi register
-    √ test multi register.Using array
     √ test receiveOnce
     √ test cancel and receiveOnce
 
 
-  8 passing (27ms)
+  5 passing (15ms)
  */
 
 describe('test global event space', function () {
@@ -45,47 +42,6 @@ describe('test global event space', function () {
             }
         });
 
-        receive('test.2.3', (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else if (cycle === 1) {
-                expect(data).to.be.equal('b');
-            } else {
-                expect(data).to.be.equal('c');
-                done();
-            }
-        });
-
-        send('test', 'a');
-        cycle++;
-
-        send('test.2', 'b');
-        cycle++;
-
-        send('test.2.3', 'c');
-    });
-
-    it('test event level. Using array', function (done) {
-        let cycle = 0;
-
-        receive(['test'], (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else {
-                expect().fail(`"test" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
-        receive(['test', '2'], (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else if (cycle === 1) {
-                expect(data).to.be.equal('b');
-            } else {
-                expect().fail(`"test.2" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
         receive(['test', '2', '3'], (data) => {
             if (cycle === 0) {
                 expect(data).to.be.equal('a');
@@ -103,49 +59,29 @@ describe('test global event space', function () {
         send(['test', '2'], 'b');
         cycle++;
 
-        send(['test', '2', '3'], 'c');
+        send('test.2.3', 'c');
     });
 
-    it('test cancel', function () {
+    it('test cancel', function (done) {
 
         receive('test', (data) => {
             expect(data).to.be.equal('a');
+            done();
         });
 
         receive('test.2', (data) => {
             expect().fail(`"test.2" can\`t be triggered`);
         });
 
-        receive('test.2.3', (data) => {
+        receive(['test', '2', '3'], (data) => {
             expect().fail(`"test.2.3" can\`t be triggered`);
         });
 
         cancel('test.2');
 
-        send('test', 'a');
-        send('test.2', 'b');
-        send('test.2.3', 'c');
-    });
-
-    it('test cancel.Using array', function () {
-
-        receive(['test'], (data) => {
-            expect(data).to.be.equal('a');
-        });
-
-        receive(['test', '2'], (data) => {
-            expect().fail(`"test.2" can\`t be triggered`);
-        });
-
-        receive(['test', '2', '3'], (data) => {
-            expect().fail(`"test.2.3" can\`t be triggered`);
-        });
-
-        cancel(['test', '2']);
-
         send(['test'], 'a');
         send(['test', '2'], 'b');
-        send(['test', '2', '3'], 'c');
+        send('test.2.3', 'c');
     });
 
     it('test multi register', function (done) {
@@ -187,52 +123,22 @@ describe('test global event space', function () {
         send('test.2.3', 'c');
     });
 
-    it('test multi register.Using array', function (done) {
+    it('test receiveOnce', function (done) {
         let cycle = 0;
 
-        receive(['test'], (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else {
-                expect().fail(`"test" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
-        receive(['test'], (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else {
-                expect().fail(`"test" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
-        receive(['test', '2'], (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else if (cycle === 1) {
-                expect(data).to.be.equal('b');
-                done();
-            } else {
-                expect().fail(`"test.2" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
-        send(['test'], 'a');
-        cycle++;
-
-        send(['test', '2'], 'b');
-        cycle++;
-
-        send(['test', '2', '3'], 'c');
-    });
-
-    it('test receiveOnce', function () {
         receiveOnce('test', (data) => {
             expect(data).to.be.equal('a');
         });
 
-        receiveOnce('test.2', (data) => {
-            expect(data).to.be.equal('a');
+        receive('test.2', (data) => {
+            if (cycle === 0) {
+                expect(data).to.be.equal('a');
+            } else if (cycle === 1) {
+                expect(data).to.be.equal('b');
+            } else {
+                expect(data).to.be.equal('c');
+                done();
+            }
         });
 
         receiveOnce('test', (data) => {
@@ -240,7 +146,11 @@ describe('test global event space', function () {
         });
 
         send('test', 'a');
+        cycle++;
+
         send('test', 'b');
+        cycle++;
+
         send('test.2', 'c');
     });
 

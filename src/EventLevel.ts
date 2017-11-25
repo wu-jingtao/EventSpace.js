@@ -11,7 +11,6 @@ export class EventLevel {
     private readonly _receivers: Set<receiver> = new Set();           //当前层级的接收器
     private readonly _children: Map<string, EventLevel> = new Map();    //子层级, key:子层级名称
 
-
     getLevel(levelNameArray: string[], autoCreateLevel?: false): EventLevel | undefined
     getLevel(levelNameArray: string[], autoCreateLevel?: true): EventLevel
     /**
@@ -57,22 +56,8 @@ export class EventLevel {
         const level = this.getLevel(levelNameArray);
 
         if (level !== undefined) {
-            this._receivers.clear();
-            this._children.clear();
-        }
-    }
-
-    /**
-     * 判定在指定的事件层级下是否绑定的有监听器
-     * @param levelNameArray 层级名字数组
-     */
-    hasReceiver(levelNameArray: string[]): boolean {
-        const level = this.getLevel(levelNameArray);
-
-        if (level !== undefined) {
-            return this._receivers.size > 0 || this._children.size > 0;
-        } else {
-            return false;
+            level._receivers.clear();
+            level._children.clear();
         }
     }
 
@@ -85,13 +70,12 @@ export class EventLevel {
         const level = this.getLevel(levelNameArray);
 
         if (level !== undefined) {
-            level._receivers.forEach(function (item) {
-                item(data);
-            });
+            const triggerChildren = (level: EventLevel) => {
+                level._receivers.forEach(item => item(data));
+                level._children.forEach(triggerChildren);
+            }
 
-            level._children.forEach(function (child) {
-                child.trigger([], data);
-            });
+            triggerChildren(level);
         }
     };
 }

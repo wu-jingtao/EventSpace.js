@@ -22,11 +22,6 @@ export declare class EventLevel {
      */
     removeReceiver(levelNameArray: string[]): void;
     /**
-     * 判定在指定的事件层级下是否绑定的有监听器
-     * @param levelNameArray 层级名字数组
-     */
-    hasReceiver(levelNameArray: string[]): boolean;
-    /**
      * 触发所有指定级别以及子级的监听器
      * @param levelNameArray 事件层级名字数组
      * @param data 要给触发的方法传递的数据
