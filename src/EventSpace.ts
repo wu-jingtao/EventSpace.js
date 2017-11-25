@@ -65,7 +65,7 @@ export default class EventSpace {
      * @param eventName 要触发的事件名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param data 要发送的数据
      */
-    send = (eventName: any | any[], data: any, _this_?: Object) => {
+    send = (eventName: string | string[], data: any) => {
         this._eventLevel.trigger(convertEventNameType(eventName), data);
     }
     trigger = this.send;

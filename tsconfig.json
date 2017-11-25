@@ -1,14 +1,18 @@
 {
     "compilerOptions": {
-        "module":"commonjs",
+        "module": "commonjs",
         "target": "es6",
-        "noImplicitAny": true,
-        "removeComments": true,
+        "removeComments": false,
         "preserveConstEnums": false,
         "declaration": true,
         "experimentalDecorators": false,
         "noEmitOnError": true,
-        "lib":["es6"]
+        "strict": true,
+        "lib": [
+            "es2016",
+            "dom",
+            "dom.iterable"
+        ]
     },
     "exclude": [
         "node_modules",
