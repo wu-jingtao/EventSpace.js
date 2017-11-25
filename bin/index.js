@@ -1,8 +1,16 @@
 "use strict";
-/**
- * Created by 吴劲韬 on 2017/3/12.
- */
-const Global_1 = require("./Global");
-module.exports = new Global_1.default();
+const EventSpace_1 = require("./EventSpace");
+const global = new EventSpace_1.default();
+module.exports = {
+    EventSpace: EventSpace_1.default,
+    receive: global.receive,
+    on: global.on,
+    receiveOnce: global.receiveOnce,
+    once: global.once,
+    cancel: global.cancel,
+    off: global.off,
+    send: global.send,
+    trigger: global.trigger
+};
 
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImluZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQTs7R0FFRztBQUVILHFDQUE4QjtBQUU5QixpQkFBUyxJQUFJLGdCQUFNLEVBQUUsQ0FBQyIsImZpbGUiOiJpbmRleC5qcyIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxyXG4gKiBDcmVhdGVkIGJ5IOWQtOWKsumfrCBvbiAyMDE3LzMvMTIuXHJcbiAqL1xyXG5cclxuaW1wb3J0IEdsb2JhbCBmcm9tICcuL0dsb2JhbCc7XHJcblxyXG5leHBvcnQgPSBuZXcgR2xvYmFsKCk7XHJcbiJdfQ==
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImluZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQSw2Q0FBc0M7QUFFdEMsTUFBTSxNQUFNLEdBQUcsSUFBSSxvQkFBVSxFQUFFLENBQUM7QUFFaEMsaUJBQVM7SUFDTCxVQUFVLEVBQVYsb0JBQVU7SUFDVixPQUFPLEVBQUUsTUFBTSxDQUFDLE9BQU87SUFDdkIsRUFBRSxFQUFFLE1BQU0sQ0FBQyxFQUFFO0lBQ2IsV0FBVyxFQUFFLE1BQU0sQ0FBQyxXQUFXO0lBQy9CLElBQUksRUFBRSxNQUFNLENBQUMsSUFBSTtJQUNqQixNQUFNLEVBQUUsTUFBTSxDQUFDLE1BQU07SUFDckIsR0FBRyxFQUFFLE1BQU0sQ0FBQyxHQUFHO0lBQ2YsSUFBSSxFQUFFLE1BQU0sQ0FBQyxJQUFJO0lBQ2pCLE9BQU8sRUFBRSxNQUFNLENBQUMsT0FBTztDQUMxQixDQUFBIiwiZmlsZSI6ImluZGV4LmpzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IEV2ZW50U3BhY2UgZnJvbSBcIi4vRXZlbnRTcGFjZVwiO1xyXG5cclxuY29uc3QgZ2xvYmFsID0gbmV3IEV2ZW50U3BhY2UoKTtcclxuXHJcbmV4cG9ydCA9IHtcclxuICAgIEV2ZW50U3BhY2UsXHJcbiAgICByZWNlaXZlOiBnbG9iYWwucmVjZWl2ZSxcclxuICAgIG9uOiBnbG9iYWwub24sXHJcbiAgICByZWNlaXZlT25jZTogZ2xvYmFsLnJlY2VpdmVPbmNlLFxyXG4gICAgb25jZTogZ2xvYmFsLm9uY2UsXHJcbiAgICBjYW5jZWw6IGdsb2JhbC5jYW5jZWwsXHJcbiAgICBvZmY6IGdsb2JhbC5vZmYsXHJcbiAgICBzZW5kOiBnbG9iYWwuc2VuZCxcclxuICAgIHRyaWdnZXI6IGdsb2JhbC50cmlnZ2VyXHJcbn1cclxuIl19

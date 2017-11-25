@@ -1,7 +1,15 @@
-/**
- * Created by 吴劲韬 on 2017/3/12.
- */
+import EventSpace from "./EventSpace";
 
-import Global from './Global';
+const global = new EventSpace();
 
-export = new Global();
+export = {
+    EventSpace,
+    receive: global.receive,
+    on: global.on,
+    receiveOnce: global.receiveOnce,
+    once: global.once,
+    cancel: global.cancel,
+    off: global.off,
+    send: global.send,
+    trigger: global.trigger
+}

@@ -3,18 +3,6 @@ import _ = require('lodash');
 import es = require('..');
 const { receive, send, cancel, receiveOnce, EventSpace } = es;
 
-/** 最近一次测试结果
-  test global event space
-    √ test event level
-    √ test cancel
-    √ test multi register
-    √ test receiveOnce
-    √ test cancel and receiveOnce
-
-
-  5 passing (15ms)
- */
-
 describe('test global event space', function () {
 
     beforeEach('clear all event listener', function () {
