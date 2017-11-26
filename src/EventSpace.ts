@@ -4,9 +4,9 @@ import { EventLevel, receiver } from "./EventLevel";
  * 根据规则将事件名转换成数组的形式
  * @param eventName 事件名称
  */
-function convertEventNameType(eventName: string | string[] = []): string[] {
+function convertEventNameType(eventName: string | string[]): string[] {
     if ('string' === typeof eventName)
-        return eventName.split('.');
+        return eventName.length === 0 ? [] : eventName.split('.');  //避免空字符串返回[""]
     else
         return eventName;
 }
@@ -39,12 +39,12 @@ export default class EventSpace {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
 
-        eventName = convertEventNameType(eventName);
-        eventName.push(Math.random().toString());  //确保只删除自身
+        const en = convertEventNameType(eventName);
+        en.push(Math.random().toString());  //确保只删除自身
 
-        this.receive(eventName, (data) => {
+        this._eventLevel.addReceiver(en, (data) => {
             receiver(data);
-            this.cancel(eventName);
+            this._eventLevel.removeReceiver(en);
         });
 
         return receiver;
@@ -55,7 +55,7 @@ export default class EventSpace {
      * 注销数据接收器（别名 off）
      * @param eventName 注销事件接收器的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      */
-    cancel = (eventName?: string | string[]) => {
+    cancel = (eventName: string | string[]) => {
         this._eventLevel.removeReceiver(convertEventNameType(eventName));
     }
     off = this.cancel;

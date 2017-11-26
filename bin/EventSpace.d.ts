@@ -19,8 +19,8 @@ export default class EventSpace {
      * 注销数据接收器（别名 off）
      * @param eventName 注销事件接收器的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      */
-    cancel: (eventName?: string | string[] | undefined) => void;
-    off: (eventName?: string | string[] | undefined) => void;
+    cancel: (eventName: string | string[]) => void;
+    off: (eventName: string | string[]) => void;
     /**
      * 触发指定的事件接收器（别名 trigger）
      * @param eventName 要触发的事件名称.可以为字符串或数组(字符串通过‘.’来分割层级)

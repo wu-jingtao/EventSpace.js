@@ -5,8 +5,8 @@ declare var _default: {
     on: (eventName: string | string[], receiver: (data?: any, eventName?: string[] | undefined) => void) => (data?: any, eventName?: string[] | undefined) => void;
     receiveOnce: (eventName: string | string[], receiver: (data?: any, eventName?: string[] | undefined) => void) => (data?: any, eventName?: string[] | undefined) => void;
     once: (eventName: string | string[], receiver: (data?: any, eventName?: string[] | undefined) => void) => (data?: any, eventName?: string[] | undefined) => void;
-    cancel: (eventName?: string | string[] | undefined) => void;
-    off: (eventName?: string | string[] | undefined) => void;
+    cancel: (eventName: string | string[]) => void;
+    off: (eventName: string | string[]) => void;
     send: (eventName: string | string[], data: any) => void;
     trigger: (eventName: string | string[], data: any) => void;
 };

@@ -8,7 +8,7 @@ export type receiver = (data?: any, eventName?: string[]) => void;
  */
 export class EventLevel {
 
-    private readonly _receivers: Set<receiver> = new Set();           //当前层级的接收器
+    private readonly _receivers: receiver[] = [];           //当前层级的接收器
     private readonly _children: Map<string, EventLevel> = new Map();    //子层级, key:子层级名称
 
     getLevel(levelNameArray: string[], autoCreateLevel?: false): EventLevel | undefined
@@ -45,7 +45,7 @@ export class EventLevel {
      * @param receiver 监听器
      */
     addReceiver(levelNameArray: string[], receiver: receiver) {  //添加新的监听器
-        this.getLevel(levelNameArray, true)._receivers.add(receiver);
+        this.getLevel(levelNameArray, true)._receivers.push(receiver);
     }
 
     /**
@@ -56,7 +56,7 @@ export class EventLevel {
         const level = this.getLevel(levelNameArray);
 
         if (level !== undefined) {
-            level._receivers.clear();
+            level._receivers.length = 0;
             level._children.clear();
         }
     }
