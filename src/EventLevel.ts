@@ -1,7 +1,7 @@
 /**
  * 接收器回调函数
  */
-export type receiver = (data?: any, eventName?: string[]) => void;
+export type receiver = (data?: any) => any;
 
 /**
  * 事件层级类

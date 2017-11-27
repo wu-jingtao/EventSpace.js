@@ -20,7 +20,7 @@ export default class EventSpace {
      * @param eventName 接收事件的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param receiver 回调函数
      */
-    receive = (eventName: string | string[], receiver: receiver) => {
+    receive = <T extends receiver>(eventName: string | string[], receiver: T) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
 
@@ -35,14 +35,14 @@ export default class EventSpace {
      * @param eventName 接收事件的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param receiver 回调函数
      */
-    receiveOnce = (eventName: string | string[], receiver: receiver) => {
+    receiveOnce = <T extends receiver>(eventName: string | string[], receiver: T) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
             throw new Error('receiver must be function');
 
         const en = convertEventNameType(eventName);
         en.push(Math.random().toString());  //确保只删除自身
 
-        this._eventLevel.addReceiver(en, (data) => {
+        this._eventLevel.addReceiver(en, (data: any) => {
             receiver(data);
             this._eventLevel.removeReceiver(en);
         });
