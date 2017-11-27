@@ -17,12 +17,12 @@ export default class EventSpace {
 
     /**
      * 注册事件监听器（别名 on）
-     * @param eventName 接收事件的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
+     * @param eventName 接收事件的名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param receiver 回调函数
      */
     receive = <T extends receiver>(eventName: string | string[], receiver: T) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
-            throw new Error('receiver must be function');
+            throw new Error('receiver must be a function');
 
         this._eventLevel.addReceiver(convertEventNameType(eventName), receiver);
 
@@ -32,40 +32,43 @@ export default class EventSpace {
 
     /**
      * 注册只接收一次的事件监听器（别名 once）
-     * @param eventName 接收事件的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
+     * @param eventName 接收事件的名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param receiver 回调函数
      */
     receiveOnce = <T extends receiver>(eventName: string | string[], receiver: T) => {
         if ('function' !== typeof receiver)  /*验证数据类型*/
-            throw new Error('receiver must be function');
+            throw new Error('receiver must be a function');
 
-        const en = convertEventNameType(eventName);
-        en.push(Math.random().toString());  //确保只删除自身
+        const level = convertEventNameType(eventName);
 
-        this._eventLevel.addReceiver(en, (data: any) => {
+        const once: receiver = (data) => {
             receiver(data);
-            this._eventLevel.removeReceiver(en);
-        });
-
+            this.cancel(level, once);
+        }
+        
+        this.receive(level, once);
+     
         return receiver;
     }
     once = this.receiveOnce;
 
     /**
-     * 注销数据接收器（别名 off）
-     * @param eventName 注销事件接收器的名称.可以为字符串或数组(字符串通过‘.’来分割层级)
+     * 移除指定层级上的数据接收器（别名 off）。可以传递第二个参数来确保只移除指定的接收器
+     * @param eventName 移除事件接收器的名称。可以为字符串或数组(字符串通过‘.’来分割层级)
+     * @param receiver 要移除的回调函数
      */
-    cancel = (eventName: string | string[]) => {
-        this._eventLevel.removeReceiver(convertEventNameType(eventName));
+    cancel = <T extends receiver>(eventName: string | string[], receiver?: T) => {
+        this._eventLevel.removeReceiver(convertEventNameType(eventName), receiver);
+        return receiver;
     }
     off = this.cancel;
 
     /**
      * 触发指定的事件接收器（别名 trigger）
-     * @param eventName 要触发的事件名称.可以为字符串或数组(字符串通过‘.’来分割层级)
+     * @param eventName 要触发的事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param data 要发送的数据
      */
-    send = (eventName: string | string[], data: any) => {
+    send = (eventName: string | string[], data?: any) => {
         this._eventLevel.trigger(convertEventNameType(eventName), data);
     }
     trigger = this.send;

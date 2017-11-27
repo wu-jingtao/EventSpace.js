@@ -17,10 +17,11 @@ export declare class EventLevel {
      */
     addReceiver(levelNameArray: string[], receiver: receiver): void;
     /**
-     * 移除指定层级的事件监听器
+     * 移除指定层级的事件监听器。还可以传递一个监听器来确保只删除它自身。
      * @param levelNameArray 层级名字数组
+     * @param receiver 要删除的监听器
      */
-    removeReceiver(levelNameArray: string[]): void;
+    removeReceiver(levelNameArray: string[], receiver?: receiver): void;
     /**
      * 触发所有指定级别以及子级的监听器
      * @param levelNameArray 事件层级名字数组

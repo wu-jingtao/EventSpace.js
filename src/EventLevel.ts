@@ -8,7 +8,7 @@ export type receiver = (data?: any) => any;
  */
 export class EventLevel {
 
-    private readonly _receivers: receiver[] = [];           //当前层级的接收器
+    private readonly _receivers: Set<receiver> = new Set();             //当前层级的接收器
     private readonly _children: Map<string, EventLevel> = new Map();    //子层级, key:子层级名称
 
     getLevel(levelNameArray: string[], autoCreateLevel?: false): EventLevel | undefined
@@ -45,19 +45,24 @@ export class EventLevel {
      * @param receiver 监听器
      */
     addReceiver(levelNameArray: string[], receiver: receiver) {  //添加新的监听器
-        this.getLevel(levelNameArray, true)._receivers.push(receiver);
+        this.getLevel(levelNameArray, true)._receivers.add(receiver);
     }
 
     /**
-     * 移除指定层级的事件监听器
+     * 移除指定层级的事件监听器。还可以传递一个监听器来确保只删除它自身。
      * @param levelNameArray 层级名字数组
+     * @param receiver 要删除的监听器
      */
-    removeReceiver(levelNameArray: string[]) {
+    removeReceiver(levelNameArray: string[], receiver?: receiver) {
         const level = this.getLevel(levelNameArray);
 
         if (level !== undefined) {
-            level._receivers.length = 0;
-            level._children.clear();
+            if (receiver !== undefined)
+                level._receivers.delete(receiver);
+            else {
+                level._receivers.clear();
+                level._children.clear();
+            }
         }
     }
 
