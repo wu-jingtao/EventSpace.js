@@ -1,5 +1,5 @@
 /**
- * 接收器回调函数
+ * 事件监听器回调函数
  */
 export type receiver = (data?: any) => any;
 
@@ -8,18 +8,21 @@ export type receiver = (data?: any) => any;
  */
 export class EventLevel {
 
-    private readonly _receivers: Set<receiver> = new Set();             //当前层级的接收器
+    private readonly _receivers: Set<receiver> = new Set();             //当前层级的事件监听器
     private readonly _children: Map<string, EventLevel> = new Map();    //子层级, key:子层级名称
 
-    getLevel(levelNameArray: string[], autoCreateLevel?: false): EventLevel | undefined
-    getLevel(levelNameArray: string[], autoCreateLevel?: true): EventLevel
     /**
-     * 获取指定层级
-     * @param levelNameArray 事件层级名字数组
-     * @param autoCreateLevel 是否自动创建不存在的层级，默认false
+     * 获取指定层级，如果不存在就返回空
+     * @param levelNameArray 事件层级名称数组
      */
+    getLevel(levelNameArray: string[], autoCreateLevel?: false): EventLevel | undefined
+    /**
+     * 获取指定层级，如果不存在就自动创建
+     * @param levelNameArray 事件层级名称数组
+     */
+    getLevel(levelNameArray: string[], autoCreateLevel?: true): EventLevel
     getLevel(levelNameArray: string[], autoCreateLevel: boolean = false) {
-        let level: EventLevel = this;   //查询到的对应层级
+        let level: EventLevel = this;   
 
         for (const currentName of levelNameArray) {
             let currentLevel = level._children.get(currentName);
@@ -40,19 +43,25 @@ export class EventLevel {
     }
 
     /**
-     * 添加接收器
-     * @param levelNameArray 事件层级名字数组
-     * @param receiver 监听器
+     * 添加事件监听器
+     * @param levelNameArray 事件层级名称数组
+     * @param receiver 事件监听器
      */
-    addReceiver(levelNameArray: string[], receiver: receiver) {  //添加新的监听器
+    addReceiver(levelNameArray: string[], receiver: receiver) {
         this.getLevel(levelNameArray, true)._receivers.add(receiver);
     }
 
     /**
-     * 移除指定层级的事件监听器。还可以传递一个监听器来确保只删除它自身。
-     * @param levelNameArray 层级名字数组
-     * @param receiver 要删除的监听器
+     * 移除指定层级上的所有监听器
+     * @param levelNameArray 层级名称数组
      */
+    removeReceiver(levelNameArray: string[]): void
+    /**
+     * 移除指定层级上的特定监听器
+     * @param levelNameArray 层级名称数组
+     * @param receiver 要移除的监听器
+     */
+    removeReceiver(levelNameArray: string[], receiver: receiver): void
     removeReceiver(levelNameArray: string[], receiver?: receiver) {
         const level = this.getLevel(levelNameArray);
 
@@ -67,9 +76,9 @@ export class EventLevel {
     }
 
     /**
-     * 触发所有指定级别以及子级的监听器
-     * @param levelNameArray 事件层级名字数组
-     * @param data 要给触发的方法传递的数据
+     * 触发指定级别以及其子级的事件监听器
+     * @param levelNameArray 事件层级名称数组
+     * @param data 要给触发的事件监听器传递的数据
      */
     trigger(levelNameArray: string[], data: any) {
         const level = this.getLevel(levelNameArray);
@@ -82,5 +91,5 @@ export class EventLevel {
 
             triggerChildren(level);
         }
-    };
+    }
 }

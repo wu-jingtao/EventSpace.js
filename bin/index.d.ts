@@ -5,8 +5,8 @@ declare var _default: {
     on: <T extends (data?: any) => any>(eventName: string | string[], receiver: T) => T;
     receiveOnce: <T extends (data?: any) => any>(eventName: string | string[], receiver: T) => T;
     once: <T extends (data?: any) => any>(eventName: string | string[], receiver: T) => T;
-    cancel: <T extends (data?: any) => any>(eventName: string | string[], receiver?: T | undefined) => T | undefined;
-    off: <T extends (data?: any) => any>(eventName: string | string[], receiver?: T | undefined) => T | undefined;
+    cancel: <T extends (data?: any) => any>(eventName?: string | string[], receiver?: T | undefined) => void;
+    off: <T extends (data?: any) => any>(eventName?: string | string[], receiver?: T | undefined) => void;
     send: (eventName: string | string[], data?: any) => void;
     trigger: (eventName: string | string[], data?: any) => void;
 };

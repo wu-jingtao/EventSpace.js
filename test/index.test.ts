@@ -6,7 +6,7 @@ const { receive, send, cancel, receiveOnce, EventSpace } = es;
 describe('test global event space', function () {
 
     beforeEach('clear all event listener', function () {
-        cancel('');
+        cancel();
     });
 
     it('test event level', function (done) {
