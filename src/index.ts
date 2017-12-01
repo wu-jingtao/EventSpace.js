@@ -11,5 +11,6 @@ export = {
     cancel: global.cancel,
     off: global.off,
     send: global.send,
-    trigger: global.trigger
+    trigger: global.trigger,
+    has: global.has
 }

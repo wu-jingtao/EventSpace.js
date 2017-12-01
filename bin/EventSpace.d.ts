@@ -29,4 +29,9 @@ export default class EventSpace {
      */
     send: (eventName: string | string[], data?: any) => void;
     trigger: (eventName: string | string[], data?: any) => void;
+    /**
+     * 检查某个事件名称下是否包含的有监听器。
+     * 可以传递一个boolean，判断子级是否包含的有，或者传递一个receiver，判定是否有指定的监听器。
+     */
+    has: (eventName: string | string[], receiverOrChildren?: boolean | receiver | undefined) => boolean;
 }

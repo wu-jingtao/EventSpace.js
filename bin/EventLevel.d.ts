@@ -12,12 +12,12 @@ export declare class EventLevel {
      * 获取指定层级，如果不存在就返回空
      * @param levelNameArray 事件层级名称数组
      */
-    getLevel(levelNameArray: string[], autoCreateLevel?: false): EventLevel | undefined;
+    private getLevel(levelNameArray, autoCreateLevel?);
     /**
      * 获取指定层级，如果不存在就自动创建
      * @param levelNameArray 事件层级名称数组
      */
-    getLevel(levelNameArray: string[], autoCreateLevel?: true): EventLevel;
+    private getLevel(levelNameArray, autoCreateLevel?);
     /**
      * 添加事件监听器
      * @param levelNameArray 事件层级名称数组
@@ -35,6 +35,18 @@ export declare class EventLevel {
      * @param receiver 要移除的监听器
      */
     removeReceiver(levelNameArray: string[], receiver: receiver): void;
+    /**
+     * 检查特定级别上是否包含的有监听器
+     * @param levelNameArray 层级名称数组
+     * @param receiver 检查是否有指定的监听器
+     */
+    hasReceiver(levelNameArray: string[], receiver?: receiver): boolean;
+    /**
+     * 检查特定级别上是否包含的有监听器
+     * @param levelNameArray 层级名称数组
+     * @param includeChildren 是否包含子级，默认false
+     */
+    hasReceiver(levelNameArray: string[], includeChildren?: boolean): boolean;
     /**
      * 触发指定级别以及其子级的事件监听器
      * @param levelNameArray 事件层级名称数组

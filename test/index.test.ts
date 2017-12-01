@@ -1,7 +1,7 @@
 import expect = require('expect.js');
 import _ = require('lodash');
 import es = require('..');
-const { receive, send, cancel, receiveOnce, EventSpace } = es;
+const { receive, send, cancel, receiveOnce, has } = es;
 
 describe('test global event space', function () {
 
@@ -160,5 +160,22 @@ describe('test global event space', function () {
         send('test', 'a');
         send('test', 'b');
         send('test.2', 'c');
+    });
+
+    it('test has', function () {
+        function test() { }
+        receive('a.b.c', test);
+
+        expect(has('a.b.c')).to.be.ok();
+
+        expect(has('a')).to.not.be.ok();
+        expect(has('a.b')).to.not.be.ok();
+
+        expect(has('a', true)).to.be.ok();
+        expect(has('a.b', true)).to.be.ok();
+        expect(has('a.b.c', true)).to.be.ok();
+
+        expect(has('a.b.c', test)).to.be.ok();
+        expect(has('a.b.c', () => { })).to.not.be.ok();
     });
 });

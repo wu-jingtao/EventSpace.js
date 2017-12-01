@@ -18,7 +18,7 @@ export default class EventSpace {
      * @param receiver 回调函数
      */
     receive = <T extends receiver>(eventName: string | string[], receiver: T) => {
-        if ('function' !== typeof receiver)  
+        if ('function' !== typeof receiver)
             throw new Error('receiver must be a function');
 
         this._eventLevel.addReceiver(convertEventNameType(eventName), receiver);
@@ -33,7 +33,7 @@ export default class EventSpace {
      * @param receiver 回调函数
      */
     receiveOnce = <T extends receiver>(eventName: string | string[], receiver: T) => {
-        if ('function' !== typeof receiver)  
+        if ('function' !== typeof receiver)
             throw new Error('receiver must be a function');
 
         const level = convertEventNameType(eventName);
@@ -68,4 +68,12 @@ export default class EventSpace {
         this._eventLevel.trigger(convertEventNameType(eventName), data);
     }
     trigger = this.send;
+
+    /**
+     * 检查某个事件名称下是否包含的有监听器。
+     * 可以传递一个boolean，判断子级是否包含的有，或者传递一个receiver，判定是否有指定的监听器。
+     */
+    has = (eventName: string | string[], receiverOrChildren?: receiver | boolean) => {
+        return this._eventLevel.hasReceiver(convertEventNameType(eventName), receiverOrChildren as any);
+    }
 }
