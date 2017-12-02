@@ -1,16 +1,8 @@
-import EventSpace from "./EventSpace";
+import { EventSpace } from "./classes/EventSpace";
+import { EventSpaceType } from "./interfaces/EventSpaceType";
 
-const global = new EventSpace();
-
-export = {
+const es: EventSpaceType & { EventSpace: EventSpace } = {
     EventSpace,
-    receive: global.receive,
-    on: global.on,
-    receiveOnce: global.receiveOnce,
-    once: global.once,
-    cancel: global.cancel,
-    off: global.off,
-    send: global.send,
-    trigger: global.trigger,
-    has: global.has
-}
+    ... new EventSpace()
+} as any;
+export = es;
