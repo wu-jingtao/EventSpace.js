@@ -1,5 +1,5 @@
 import expect = require('expect.js');
-import { receive, receiveOnce, cancel, trigger, has } from '../src';
+import { receive, receiveOnce, cancel, cancelReverse, trigger, triggerReverse, has, hasReverse } from '../src';
 
 beforeEach('清除所有注册过的监听器', function () {
     cancel();
@@ -81,6 +81,29 @@ it('测试 trigger 不触发子级', function () {
     ]);
 });
 
+it('测试 triggerReverse', function () {
+    const result: number[] = [];
+
+    receive('a', (data) => result.push(data));
+    receive('a.b', (data) => result.push(data));
+    receive('a.b.c', (data) => result.push(data));
+
+    triggerReverse('a', 1);
+    triggerReverse('a.b', 2);
+    triggerReverse('a.b.c', 3);
+    triggerReverse('a.b.c.d', 4);
+
+    triggerReverse(['a'], 1);
+    triggerReverse(['a', 'b'], 2);
+    triggerReverse(['a', 'b', 'c'], 3);
+    triggerReverse(['a', 'b', 'c', 'd'], 4);
+
+    expect(result).to.eql([
+        1, 2, 2, 3, 3, 3, 4, 4, 4,
+        1, 2, 2, 3, 3, 3, 4, 4, 4
+    ]);
+});
+
 describe('测试 cancel', function () {
     it('只清除指定级别的监听器（不清除子级）', function () {
         const result: number[] = [];
@@ -120,6 +143,23 @@ describe('测试 cancel', function () {
     });
 });
 
+it('测试 cancelReverse', function () {
+    const result: number[] = [];
+
+    receive('a', (data) => result.push(data));
+    receiveOnce('a.b', (data) => result.push(data));
+    receive('a.b.c', (data) => result.push(data));
+
+    cancelReverse('a.b');
+
+    trigger(['a'], 1);
+    trigger(['a', 'b'], 2);
+    trigger(['a', 'b', 'c'], 3);
+    trigger(['a', 'b', 'c', 'd'], 4);
+
+    expect(result).to.eql([1, 2, 3]);
+});
+
 describe('测试 has', function () {
     it('判断指定级别，以及其子级，是否注册的有事件监听器', function () {
         receive('a.b.c', () => { });
@@ -152,4 +192,13 @@ describe('测试 has', function () {
         expect(has('a.b.c', test)).to.not.be.ok();
         expect(has('a.b.c.d', test)).to.not.be.ok();
     });
+});
+
+it('测试 hasReverse', function () {
+    receive('a.b.c', () => { });
+
+    expect(hasReverse('a')).to.not.be.ok();
+    expect(hasReverse('a.b')).to.not.be.ok();
+    expect(hasReverse('a.b.c')).to.be.ok();
+    expect(hasReverse('a.b.c.d')).to.be.ok();
 });

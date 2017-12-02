@@ -48,6 +48,22 @@ export class EventSpace implements EventSpaceType {
     }
     off = this.cancel;
 
+    cancelReverse = (eventName: string | string[]) => {
+        let level = this._eventLevel;
+        level.receivers.clear();
+
+        for (const currentName of EventSpace.convertEventNameType(eventName)) {
+            const currentLevel = level.children.get(currentName);
+            if (currentLevel !== undefined) {
+                currentLevel.receivers.clear();
+                level = currentLevel;
+            } else {
+                return;
+            }
+        }
+    }
+    offReverse = this.cancelReverse;
+
     trigger = (eventName: string | string[], data?: any, includeChildren: boolean = true, asynchronous?: boolean) => {
         const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
@@ -64,6 +80,22 @@ export class EventSpace implements EventSpaceType {
     }
     send = this.trigger;
 
+    triggerReverse = (eventName: string | string[], data?: any, asynchronous?: boolean) => {
+        let level = this._eventLevel;
+        level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+
+        for (const currentName of EventSpace.convertEventNameType(eventName)) {
+            const currentLevel = level.children.get(currentName);
+            if (currentLevel !== undefined) {
+                currentLevel.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+                level = currentLevel;
+            } else {
+                return;
+            }
+        }
+    }
+    sendReverse = this.triggerReverse;
+
     has = (eventName: string | string[], lrc: boolean | Listener = true) => {
         const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
         if (level === undefined) {
@@ -75,7 +107,7 @@ export class EventSpace implements EventSpaceType {
                         return true;
                     else {
                         for (const item of level.children.values()) {
-                            if (checkChildren(item) === true)
+                            if (checkChildren(item))
                                 return true;
                         }
                         return false;
@@ -88,6 +120,25 @@ export class EventSpace implements EventSpaceType {
             } else {
                 return level.receivers.has(lrc);
             }
+        }
+    }
+
+    hasReverse = (eventName: string | string[]) => {
+        let level = this._eventLevel;
+        if (level.receivers.size > 0) {
+            return true;
+        } else {
+            for (const currentName of EventSpace.convertEventNameType(eventName)) {
+                const currentLevel = level.children.get(currentName);
+                if (currentLevel !== undefined) {
+                    if (currentLevel.receivers.size > 0)
+                        return true;
+                } else {
+                    return false;
+                }
+                level = currentLevel;
+            }
+            return false;
         }
     }
 }

@@ -13,7 +13,12 @@ export declare class EventSpace implements EventSpaceType {
     once: <T extends Listener>(eventName: string | string[], listener: T) => T;
     cancel: (eventName?: string | string[], lrc?: boolean | Listener) => void;
     off: (eventName?: string | string[], lrc?: boolean | Listener) => void;
+    cancelReverse: (eventName: string | string[]) => void;
+    offReverse: (eventName: string | string[]) => void;
     trigger: (eventName: string | string[], data?: any, includeChildren?: boolean, asynchronous?: boolean | undefined) => void;
     send: (eventName: string | string[], data?: any, includeChildren?: boolean, asynchronous?: boolean | undefined) => void;
+    triggerReverse: (eventName: string | string[], data?: any, asynchronous?: boolean | undefined) => void;
+    sendReverse: (eventName: string | string[], data?: any, asynchronous?: boolean | undefined) => void;
     has: (eventName: string | string[], lrc?: boolean | Listener) => boolean;
+    hasReverse: (eventName: string | string[]) => boolean;
 }
