@@ -1,6 +1,8 @@
 import { EventSpace } from "./classes/EventSpace";
+import { EventSpaceType } from "./interfaces/EventSpaceType";
 
-export = {
+const es: EventSpaceType & { EventSpace: EventSpace } = {
     EventSpace,
     ... new EventSpace()
-}
+} as any;
+export = es;

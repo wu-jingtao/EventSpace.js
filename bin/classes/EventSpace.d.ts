@@ -11,9 +11,9 @@ export declare class EventSpace implements EventSpaceType {
     on: <T extends Listener>(eventName: string | string[], listener: T) => T;
     receiveOnce: <T extends Listener>(eventName: string | string[], listener: T) => T;
     once: <T extends Listener>(eventName: string | string[], listener: T) => T;
-    cancel(eventName?: string | string[], lrc?: boolean | Listener): void;
+    cancel: (eventName?: string | string[], lrc?: boolean | Listener) => void;
     off: (eventName?: string | string[], lrc?: boolean | Listener) => void;
-    trigger(eventName: string | string[], data?: any, includeChildren?: boolean, asynchronous?: boolean): void;
+    trigger: (eventName: string | string[], data?: any, includeChildren?: boolean, asynchronous?: boolean | undefined) => void;
     send: (eventName: string | string[], data?: any, includeChildren?: boolean, asynchronous?: boolean | undefined) => void;
-    has(eventName: string | string[], lrc?: boolean | Listener): boolean;
+    has: (eventName: string | string[], lrc?: boolean | Listener) => boolean;
 }

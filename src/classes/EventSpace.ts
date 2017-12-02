@@ -8,7 +8,7 @@ export class EventSpace implements EventSpaceType {
      * @param eventName 事件名称
      */
     static convertEventNameType(eventName: string | string[]) {
-        return 'string' === typeof eventName ? eventName.split('.') : eventName;
+        return Array.isArray(eventName) ? eventName : eventName.split('.');
     }
 
     private readonly _eventLevel = new EventLevel();
@@ -33,7 +33,7 @@ export class EventSpace implements EventSpaceType {
     }
     once = this.receiveOnce;
 
-    cancel(eventName: string | string[] = [], lrc: boolean | Listener = true) {
+    cancel = (eventName: string | string[] = [], lrc: boolean | Listener = true) => {
         const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
             if (lrc === true) {
@@ -48,11 +48,11 @@ export class EventSpace implements EventSpaceType {
     }
     off = this.cancel;
 
-    trigger(eventName: string | string[], data?: any, includeChildren: boolean = true, asynchronous?: boolean): void {
+    trigger = (eventName: string | string[], data?: any, includeChildren: boolean = true, asynchronous?: boolean) => {
         const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
             level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
-            
+
             if (includeChildren) {
                 function triggerChildren(level: EventLevel) {
                     level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
@@ -64,7 +64,7 @@ export class EventSpace implements EventSpaceType {
     }
     send = this.trigger;
 
-    has(eventName: string | string[], lrc: boolean | Listener = true): boolean {
+    has = (eventName: string | string[], lrc: boolean | Listener = true) => {
         const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
         if (level === undefined) {
             return false;

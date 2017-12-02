@@ -1,181 +1,158 @@
 import expect = require('expect.js');
-import _ = require('lodash');
-import es = require('..');
-const { receive, send, cancel, receiveOnce, has } = es;
+import es = require('../src');
+const { receive, receiveOnce, cancel, trigger, has } = es;
 
-describe('test global event space', function () {
+beforeEach('清除所有注册过的监听器', function () {
+    cancel();
+});
 
-    beforeEach('clear all event listener', function () {
-        cancel();
+it('测试 receive', function () {
+
+    const result: number[] = [];
+
+    receive('a', (data) => result.push(data));
+    receive('a.b', (data) => result.push(data));
+    receive('a.b.c', (data) => result.push(data));
+
+    receive(['a'], (data) => result.push(data));
+    receive(['a', 'b'], (data) => result.push(data));
+    receive(['a', 'b', 'c'], (data) => result.push(data));
+
+    trigger('a', 1);
+    trigger('a.b', 2);
+    trigger('a.b.c', 3);
+    trigger('a.b.c.d', 4);
+
+    trigger(['a'], 1);
+    trigger(['a', 'b'], 2);
+    trigger(['a', 'b', 'c'], 3);
+    trigger(['a', 'b', 'c', 'd'], 4);
+
+    expect(result).to.eql([
+        1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3,
+        1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3
+    ]);
+});
+
+it('测试 receiveOnce', function () {
+
+    const result: number[] = [];
+
+    receiveOnce('a', (data) => result.push(data));
+    receiveOnce('a.b', (data) => result.push(data));
+    receiveOnce('a.b.c', (data) => result.push(data));
+
+    receiveOnce(['a'], (data) => result.push(data));
+    receiveOnce(['a', 'b'], (data) => result.push(data));
+    receiveOnce(['a', 'b', 'c'], (data) => result.push(data));
+
+    trigger('a', 1);
+    trigger('a.b', 2);
+    trigger('a.b.c', 3);
+    trigger('a.b.c.d', 4);
+
+    trigger(['a'], 1);
+    trigger(['a', 'b'], 2);
+    trigger(['a', 'b', 'c'], 3);
+    trigger(['a', 'b', 'c', 'd'], 4);
+
+    expect(result).to.eql([
+        1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3
+    ]);
+});
+
+it('测试 trigger 不触发子级', function () {
+    const result: number[] = [];
+
+    receive('a', (data) => result.push(data));
+    receive('a.b', (data) => result.push(data));
+    receive('a.b.c', (data) => result.push(data));
+
+    trigger('a', 1, false);
+    trigger('a.b', 2, false);
+    trigger('a.b.c', 3, false);
+    trigger('a.b.c.d', 4, false);
+
+    trigger(['a'], 1, false);
+    trigger(['a', 'b'], 2, false);
+    trigger(['a', 'b', 'c'], 3, false);
+    trigger(['a', 'b', 'c', 'd'], 4, false);
+
+    expect(result).to.eql([
+        1, 2, 3,
+        1, 2, 3
+    ]);
+});
+
+describe('测试 cancel', function () {
+    it('只清除指定级别的监听器（不清除子级）', function () {
+        const result: number[] = [];
+
+        receive('a', (data) => result.push(data));
+        receiveOnce('a.b', (data) => result.push(data));
+        receive('a.b.c', (data) => result.push(data));
+
+        cancel('a', false);
+
+        trigger(['a'], 1);
+        trigger(['a', 'b'], 2);
+        trigger(['a', 'b', 'c'], 3);
+        trigger(['a', 'b', 'c', 'd'], 4);
+
+        expect(result).to.eql([1, 1, 2, 3]);
     });
 
-    it('test event level', function (done) {
-        let cycle = 0;
+    it('清除指定级别的特定事件监听器', function () {
+        const result: number[] = [];
 
-        receive('test', (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else {
-                expect().fail(`"test" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
+        function func(data: any) { result.push(data) }
+        receive('a', func);
 
-        receive('test.2', (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else if (cycle === 1) {
-                expect(data).to.be.equal('b');
-            } else {
-                expect().fail(`"test.2" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
+        receive('a', (data) => result.push(data));
+        receiveOnce('a.b', (data) => result.push(data));
+        receive('a.b.c', (data) => result.push(data));
 
-        receive(['test', '2', '3'], (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else if (cycle === 1) {
-                expect(data).to.be.equal('b');
-            } else {
-                expect(data).to.be.equal('c');
-                done();
-            }
-        });
+        cancel('a', func);
 
-        send(['test'], 'a');
-        cycle++;
+        trigger(['a'], 1);
+        trigger(['a', 'b'], 2);
+        trigger(['a', 'b', 'c'], 3);
+        trigger(['a', 'b', 'c', 'd'], 4);
 
-        send(['test', '2'], 'b');
-        cycle++;
-
-        send('test.2.3', 'c');
+        expect(result).to.eql([1, 1, 1, 2, 3]);
     });
+});
 
-    it('test cancel', function (done) {
+describe('测试 has', function () {
+    it('判断指定级别，以及其子级，是否注册的有事件监听器', function () {
+        receive('a.b.c', () => { });
 
-        receive('test', (data) => {
-            expect(data).to.be.equal('a');
-            done();
-        });
-
-        receive('test.2', (data) => {
-            expect().fail(`"test.2" can\`t be triggered`);
-        });
-
-        receive(['test', '2', '3'], (data) => {
-            expect().fail(`"test.2.3" can\`t be triggered`);
-        });
-
-        cancel('test.2');
-
-        send(['test'], 'a');
-        send(['test', '2'], 'b');
-        send('test.2.3', 'c');
-    });
-
-    it('test multi register', function (done) {
-        let cycle = 0;
-
-        receive('test', (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else {
-                expect().fail(`"test" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
-        receive('test', (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else {
-                expect().fail(`"test" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
-        receive('test.2', (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else if (cycle === 1) {
-                expect(data).to.be.equal('b');
-                done();
-            } else {
-                expect().fail(`"test.2" can\`t be triggered in cycle ${cycle}`);
-            }
-        });
-
-        send('test', 'a');
-        cycle++;
-
-        send('test.2', 'b');
-        cycle++;
-
-        send('test.2.3', 'c');
-    });
-
-    it('test receiveOnce', function (done) {
-        let cycle = 0;
-
-        receiveOnce('test', (data) => {
-            expect(data).to.be.equal('a');
-        });
-
-        receive('test.2', (data) => {
-            if (cycle === 0) {
-                expect(data).to.be.equal('a');
-            } else if (cycle === 1) {
-                expect(data).to.be.equal('b');
-            } else {
-                expect(data).to.be.equal('c');
-                done();
-            }
-        });
-
-        receiveOnce('test', (data) => {
-            expect(data).to.be.equal('a');
-        });
-
-        send('test', 'a');
-        cycle++;
-
-        send('test', 'b');
-        cycle++;
-
-        send('test.2', 'c');
-    });
-
-    it('test cancel and receiveOnce', function () {
-        receiveOnce('test', (data) => {
-            expect(data).to.be.equal('a');
-        });
-
-        receiveOnce('test.2', (data) => {
-            expect().fail(`"test.2" can\`t be triggered`);
-        });
-
-        receiveOnce('test', (data) => {
-            expect(data).to.be.equal('a');
-        });
-
-        cancel(['test', '2']);
-
-        send('test', 'a');
-        send('test', 'b');
-        send('test.2', 'c');
-    });
-
-    it('test has', function () {
-        function test() { }
-        receive('a.b.c', test);
-
+        expect(has('a')).to.be.ok();
+        expect(has('a.b')).to.be.ok();
         expect(has('a.b.c')).to.be.ok();
+        expect(has('a.b.c.d')).to.not.be.ok();
+    });
 
-        expect(has('a')).to.not.be.ok();
-        expect(has('a.b')).to.not.be.ok();
+    it('判断指定级别，不包括其子级，是否注册的有事件监听器', function () {
+        receive('a.b.c', () => { });
 
-        expect(has('a', true)).to.be.ok();
-        expect(has('a.b', true)).to.be.ok();
-        expect(has('a.b.c', true)).to.be.ok();
+        expect(has('a', false)).to.not.be.ok();
+        expect(has('a.b', false)).to.not.be.ok();
+        expect(has('a.b.c', false)).to.be.ok();
+        expect(has('a.b.c.d', false)).to.not.be.ok();
+    });
 
-        expect(has('a.b.c', test)).to.be.ok();
-        expect(has('a.b.c', () => { })).to.not.be.ok();
+    it('判断指定级别是否注册的有特定事件监听器', function () {
+        function test() { }
+        receive('a', test);
+
+        receive('a', () => { });
+        receive('a.b', () => { });
+        receive('a.b.c', () => { });
+
+        expect(has('a', test)).to.be.ok();
+        expect(has('a.b', test)).to.not.be.ok();
+        expect(has('a.b.c', test)).to.not.be.ok();
+        expect(has('a.b.c.d', test)).to.not.be.ok();
     });
 });
