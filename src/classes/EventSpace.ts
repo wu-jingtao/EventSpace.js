@@ -103,9 +103,9 @@ export class EventSpace implements EventSpaceType {
         } else {
             if (lrc === true) {
                 function checkChildren(level: EventLevel) {
-                    if (level.receivers.size > 0)
+                    if (level.receivers.size > 0) {
                         return true;
-                    else {
+                    } else {
                         for (const item of level.children.values()) {
                             if (checkChildren(item))
                                 return true;

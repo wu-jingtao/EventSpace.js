@@ -9,27 +9,31 @@ it('测试 receive', function () {
 
     const result: number[] = [];
 
+    receive([], (data) => result.push(data));
     receive('a', (data) => result.push(data));
     receive('a.b', (data) => result.push(data));
     receive('a.b.c', (data) => result.push(data));
 
+    receive([], (data) => result.push(data));
     receive(['a'], (data) => result.push(data));
     receive(['a', 'b'], (data) => result.push(data));
     receive(['a', 'b', 'c'], (data) => result.push(data));
 
-    trigger('a', 1);
-    trigger('a.b', 2);
-    trigger('a.b.c', 3);
-    trigger('a.b.c.d', 4);
+    trigger([], 1);
+    trigger('a', 2);
+    trigger('a.b', 3);
+    trigger('a.b.c', 4);
+    trigger('a.b.c.d', 5);
 
-    trigger(['a'], 1);
-    trigger(['a', 'b'], 2);
-    trigger(['a', 'b', 'c'], 3);
-    trigger(['a', 'b', 'c', 'd'], 4);
+    trigger([], 1);
+    trigger(['a'], 2);
+    trigger(['a', 'b'], 3);
+    trigger(['a', 'b', 'c'], 4);
+    trigger(['a', 'b', 'c', 'd'], 5);
 
     expect(result).to.eql([
-        1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3,
-        1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3
+        1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4,
+        1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4
     ]);
 });
 
@@ -37,70 +41,80 @@ it('测试 receiveOnce', function () {
 
     const result: number[] = [];
 
+    receiveOnce([], (data) => result.push(data));
     receiveOnce('a', (data) => result.push(data));
     receiveOnce('a.b', (data) => result.push(data));
     receiveOnce('a.b.c', (data) => result.push(data));
 
+    receiveOnce([], (data) => result.push(data));
     receiveOnce(['a'], (data) => result.push(data));
     receiveOnce(['a', 'b'], (data) => result.push(data));
     receiveOnce(['a', 'b', 'c'], (data) => result.push(data));
 
-    trigger('a', 1);
-    trigger('a.b', 2);
-    trigger('a.b.c', 3);
-    trigger('a.b.c.d', 4);
+    trigger([], 1);
+    trigger('a', 2);
+    trigger('a.b', 3);
+    trigger('a.b.c', 4);
+    trigger('a.b.c.d', 5);
 
-    trigger(['a'], 1);
-    trigger(['a', 'b'], 2);
-    trigger(['a', 'b', 'c'], 3);
-    trigger(['a', 'b', 'c', 'd'], 4);
+    trigger([], 1);
+    trigger(['a'], 2);
+    trigger(['a', 'b'], 3);
+    trigger(['a', 'b', 'c'], 4);
+    trigger(['a', 'b', 'c', 'd'], 5);
 
-    expect(result).to.eql([1, 1, 1, 1, 1, 1]);
+    expect(result).to.eql([1, 1, 1, 1, 1, 1, 1, 1]);
 });
 
 it('测试 trigger 不触发子级', function () {
     const result: number[] = [];
 
+    receive([], (data) => result.push(data));
     receive('a', (data) => result.push(data));
     receive('a.b', (data) => result.push(data));
     receive('a.b.c', (data) => result.push(data));
 
-    trigger('a', 1, false);
-    trigger('a.b', 2, false);
-    trigger('a.b.c', 3, false);
-    trigger('a.b.c.d', 4, false);
+    trigger([], 1, false);
+    trigger('a', 2, false);
+    trigger('a.b', 3, false);
+    trigger('a.b.c', 4, false);
+    trigger('a.b.c.d', 5, false);
 
-    trigger(['a'], 1, false);
-    trigger(['a', 'b'], 2, false);
-    trigger(['a', 'b', 'c'], 3, false);
-    trigger(['a', 'b', 'c', 'd'], 4, false);
+    trigger([], 1, false);
+    trigger(['a'], 2, false);
+    trigger(['a', 'b'], 3, false);
+    trigger(['a', 'b', 'c'], 4, false);
+    trigger(['a', 'b', 'c', 'd'], 5, false);
 
     expect(result).to.eql([
-        1, 2, 3,
-        1, 2, 3
+        1, 2, 3, 4,
+        1, 2, 3, 4
     ]);
 });
 
 it('测试 triggerReverse', function () {
     const result: number[] = [];
 
+    receive([], (data) => result.push(data));
     receive('a', (data) => result.push(data));
     receive('a.b', (data) => result.push(data));
     receive('a.b.c', (data) => result.push(data));
 
-    triggerReverse('a', 1);
-    triggerReverse('a.b', 2);
-    triggerReverse('a.b.c', 3);
-    triggerReverse('a.b.c.d', 4);
+    triggerReverse([], 1);
+    triggerReverse('a', 2);
+    triggerReverse('a.b', 3);
+    triggerReverse('a.b.c', 4);
+    triggerReverse('a.b.c.d', 5);
 
-    triggerReverse(['a'], 1);
-    triggerReverse(['a', 'b'], 2);
-    triggerReverse(['a', 'b', 'c'], 3);
-    triggerReverse(['a', 'b', 'c', 'd'], 4);
+    triggerReverse([], 1);
+    triggerReverse(['a'], 2);
+    triggerReverse(['a', 'b'], 3);
+    triggerReverse(['a', 'b', 'c'], 4);
+    triggerReverse(['a', 'b', 'c', 'd'], 5);
 
     expect(result).to.eql([
-        1, 2, 2, 3, 3, 3, 4, 4, 4,
-        1, 2, 2, 3, 3, 3, 4, 4, 4
+        1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
+        1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
     ]);
 });
 
@@ -108,18 +122,20 @@ describe('测试 cancel', function () {
     it('只清除指定级别的监听器（不清除子级）', function () {
         const result: number[] = [];
 
+        receive([], (data) => result.push(data));
         receive('a', (data) => result.push(data));
         receiveOnce('a.b', (data) => result.push(data));
         receive('a.b.c', (data) => result.push(data));
 
         cancel('a', false);
 
-        trigger(['a'], 1);
-        trigger(['a', 'b'], 2);
-        trigger(['a', 'b', 'c'], 3);
-        trigger(['a', 'b', 'c', 'd'], 4);
+        trigger([], 1);
+        trigger(['a'], 2);
+        trigger(['a', 'b'], 3);
+        trigger(['a', 'b', 'c'], 4);
+        trigger(['a', 'b', 'c', 'd'], 5);
 
-        expect(result).to.eql([1, 1, 2, 3]);
+        expect(result).to.eql([1, 1, 1, 2, 3, 4]);
     });
 
     it('清除指定级别的特定事件监听器', function () {
@@ -128,36 +144,40 @@ describe('测试 cancel', function () {
         function func(data: any) { result.push(data) }
         receive('a', func);
 
+        receive([], (data) => result.push(data));
         receive('a', (data) => result.push(data));
         receiveOnce('a.b', (data) => result.push(data));
         receive('a.b.c', (data) => result.push(data));
 
         cancel('a', func);
 
-        trigger(['a'], 1);
-        trigger(['a', 'b'], 2);
-        trigger(['a', 'b', 'c'], 3);
-        trigger(['a', 'b', 'c', 'd'], 4);
+        trigger([], 1);
+        trigger(['a'], 2);
+        trigger(['a', 'b'], 3);
+        trigger(['a', 'b', 'c'], 4);
+        trigger(['a', 'b', 'c', 'd'], 5);
 
-        expect(result).to.eql([1, 1, 1, 2, 3]);
+        expect(result).to.eql([1, 1, 1, 1, 2, 2, 3, 4]);
     });
 });
 
 it('测试 cancelReverse', function () {
     const result: number[] = [];
 
+    receive([], (data) => result.push(data));
     receive('a', (data) => result.push(data));
     receiveOnce('a.b', (data) => result.push(data));
     receive('a.b.c', (data) => result.push(data));
 
     cancelReverse('a.b');
 
-    trigger(['a'], 1);
-    trigger(['a', 'b'], 2);
-    trigger(['a', 'b', 'c'], 3);
-    trigger(['a', 'b', 'c', 'd'], 4);
+    trigger([], 1);
+    trigger(['a'], 2);
+    trigger(['a', 'b'], 3);
+    trigger(['a', 'b', 'c'], 4);
+    trigger(['a', 'b', 'c', 'd'], 5);
 
-    expect(result).to.eql([1, 2, 3]);
+    expect(result).to.eql([1, 2, 3, 4]);
 });
 
 describe('测试 has', function () {
@@ -196,7 +216,8 @@ describe('测试 has', function () {
 
 it('测试 hasReverse', function () {
     receive('a.b.c', () => { });
-
+    
+    expect(hasReverse([])).to.not.be.ok();
     expect(hasReverse('a')).to.not.be.ok();
     expect(hasReverse('a.b')).to.not.be.ok();
     expect(hasReverse('a.b.c')).to.be.ok();
