@@ -1,6 +1,5 @@
 import expect = require('expect.js');
-import es = require('../src');
-const { receive, receiveOnce, cancel, trigger, has } = es;
+import { receive, receiveOnce, cancel, trigger, has } from '../src';
 
 beforeEach('清除所有注册过的监听器', function () {
     cancel();
@@ -56,9 +55,7 @@ it('测试 receiveOnce', function () {
     trigger(['a', 'b', 'c'], 3);
     trigger(['a', 'b', 'c', 'd'], 4);
 
-    expect(result).to.eql([
-        1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3
-    ]);
+    expect(result).to.eql([1, 1, 1, 1, 1, 1]);
 });
 
 it('测试 trigger 不触发子级', function () {
