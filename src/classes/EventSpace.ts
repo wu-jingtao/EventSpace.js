@@ -1,4 +1,4 @@
-import { EventSpaceType } from './../interfaces/EventSpaceType';
+import { EventSpaceType } from '../interfaces/EventSpaceType';
 import { Listener } from '../interfaces/ListenerType';
 import { EventLevel } from "./EventLevel";
 
@@ -36,7 +36,10 @@ export class EventSpace implements EventSpaceType {
     cancel = (eventName: string | string[] = [], listener?: Listener) => {
         const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined)
-            if (listener !== undefined) level.receivers.delete(listener); else level.receivers.clear();
+            if (listener !== undefined)
+                level.receivers.delete(listener);
+            else
+                level.receivers.clear();
     }
     off = this.cancel;
 
@@ -57,7 +60,10 @@ export class EventSpace implements EventSpaceType {
             level.receivers.clear();
 
             const currentLevel = level.children.get(eventName[index]);
-            if (currentLevel !== undefined) level = currentLevel; else break;
+            if (currentLevel !== undefined)
+                level = currentLevel;
+            else
+                break;
         }
 
         if (includeSelf && index === eventName.length) level.receivers.clear();
@@ -93,7 +99,10 @@ export class EventSpace implements EventSpaceType {
             level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
 
             const currentLevel = level.children.get(eventName[index]);
-            if (currentLevel !== undefined) level = currentLevel; else break;
+            if (currentLevel !== undefined)
+                level = currentLevel;
+            else
+                break;
         }
 
         if (includeSelf && index === eventName.length)
@@ -108,7 +117,8 @@ export class EventSpace implements EventSpaceType {
                 return level.receivers.has(listener);
             else
                 return level.receivers.size > 0;
-        } else return false;
+        } else
+            return false;
     }
 
     hasDescendants = (eventName: string | string[], includeSelf: boolean = true) => {
@@ -131,7 +141,8 @@ export class EventSpace implements EventSpaceType {
                 if (checkChildren(item)) return true;
 
             return false;
-        } else return false;
+        } else
+            return false;
     }
 
     hasAncestors = (eventName: string | string[], includeSelf: boolean = true) => {
@@ -142,9 +153,15 @@ export class EventSpace implements EventSpaceType {
             if (level.receivers.size > 0) return true;
 
             const currentLevel = level.children.get(eventName[index]);
-            if (currentLevel !== undefined) level = currentLevel; else return false;
+            if (currentLevel !== undefined)
+                level = currentLevel;
+            else
+                return false;
         }
 
-        if (includeSelf) return level.receivers.size > 0; else return false;
+        if (includeSelf)
+            return level.receivers.size > 0;
+        else
+            return false;
     }
 }

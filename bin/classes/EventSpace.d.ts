@@ -1,4 +1,4 @@
-import { EventSpaceType } from './../interfaces/EventSpaceType';
+import { EventSpaceType } from '../interfaces/EventSpaceType';
 import { Listener } from '../interfaces/ListenerType';
 export declare class EventSpace implements EventSpaceType {
     /**
