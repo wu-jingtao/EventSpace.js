@@ -53,20 +53,19 @@ export class EventSpace implements EventSpaceType {
     offDescendants = this.cancelDescendants;
 
     cancelAncestors = (eventName: string | string[] = [], includeSelf: boolean = true) => {
-        eventName = EventSpace.convertEventNameType(eventName);
         let level = this._eventLevel;
 
-        for (var index = 0; index < eventName.length; index++) {
+        for (const currentName of EventSpace.convertEventNameType(eventName)) {
             level.receivers.clear();
 
-            const currentLevel = level.children.get(eventName[index]);
+            const currentLevel = level.children.get(currentName);
             if (currentLevel !== undefined)
                 level = currentLevel;
             else
-                break;
+                return;
         }
 
-        if (includeSelf && index === eventName.length) level.receivers.clear();
+        if (includeSelf) level.receivers.clear();
     }
     offAncestors = this.cancelAncestors;
 
@@ -92,21 +91,19 @@ export class EventSpace implements EventSpaceType {
     sendDescendants = this.triggerDescendants;
 
     triggerAncestors = (eventName: string | string[], data?: any, includeSelf: boolean = true, asynchronous?: boolean) => {
-        eventName = EventSpace.convertEventNameType(eventName);
         let level = this._eventLevel;
 
-        for (var index = 0; index < eventName.length; index++) {
+        for (const currentName of EventSpace.convertEventNameType(eventName)) {
             level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
 
-            const currentLevel = level.children.get(eventName[index]);
+            const currentLevel = level.children.get(currentName);
             if (currentLevel !== undefined)
                 level = currentLevel;
             else
-                break;
+                return;
         }
 
-        if (includeSelf && index === eventName.length)
-            level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+        if (includeSelf) level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
     }
     sendAncestors = this.triggerAncestors;
 
@@ -146,13 +143,12 @@ export class EventSpace implements EventSpaceType {
     }
 
     hasAncestors = (eventName: string | string[], includeSelf: boolean = true) => {
-        eventName = EventSpace.convertEventNameType(eventName);
         let level = this._eventLevel;
 
-        for (var index = 0; index < eventName.length; index++) {
+        for (const currentName of EventSpace.convertEventNameType(eventName)) {
             if (level.receivers.size > 0) return true;
 
-            const currentLevel = level.children.get(eventName[index]);
+            const currentLevel = level.children.get(currentName);
             if (currentLevel !== undefined)
                 level = currentLevel;
             else
