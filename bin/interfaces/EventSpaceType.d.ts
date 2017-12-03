@@ -15,60 +15,68 @@ export interface EventSpaceType {
     receiveOnce<T extends Listener>(eventName: string | string[], listener: T): T;
     once: EventSpaceType['receiveOnce'];
     /**
-     * 清除所有事件监听器
-     */
-    cancel(): void;
-    /**
-     * 清除指定级别的事件监听器
-     * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
-     * @param includeChildren 是否同时清除子级，默认true
-     */
-    cancel(eventName: string | string[], includeChildren?: boolean): void;
-    /**
-     * 清除指定级别的特定事件监听器
-     * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
+     * 清除指定级别的所有事件监听器。可以传递一个listener来只清除一个特定的事件监听器
+     * @param eventName 事件名称,可以为字符串或数组(字符串通过‘.’来分割层级)。默认 []
      * @param listener 要清除的特定事件监听器
      */
-    cancel(eventName: string | string[], listener: Listener): void;
+    cancel(eventName?: string | string[], listener?: Listener): void;
     off: EventSpaceType['cancel'];
     /**
-     * 清除从根到指定级别在内的所有事件监听器。跟cancel的方向正好相反
-     * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
+     * 清理指定级别的所有下级的事件监听器。可以传递一个includeSelf来指示是否要同时清除自身的事件监听器，默认true。
+     * @param eventName 事件名称,可以为字符串或数组(字符串通过‘.’来分割层级)。默认 []
+     * @param includeSelf 是否要同时清除自身的事件监听器，默认true
      */
-    cancelReverse(eventName: string | string[]): void;
-    offReverse: EventSpaceType['cancelReverse'];
+    cancelDescendants(eventName?: string | string[], includeSelf?: boolean): void;
+    offDescendants: EventSpaceType['cancelDescendants'];
+    /**
+     * 清除指定级别的所有上级的事件监听器。可以传递一个includeSelf来指示是否要同时清除自身的事件监听器，默认true。
+     * @param eventName 事件名称,可以为字符串或数组(字符串通过‘.’来分割层级)。默认 []
+     * @param includeSelf 是否要同时清除自身的事件监听器，默认true
+     */
+    cancelAncestors(eventName?: string | string[], includeSelf?: boolean): void;
+    offAncestors: EventSpaceType['cancelAncestors'];
     /**
      * 触发指定级别的事件监听器
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param data 要传递的数据
-     * @param includeChildren 是否同时要触发其子级，默认true
-     * @param asynchronous 是否异步调用，默认false。(其实就是是否使用"setTimeout(listener, 0)"来调用监听器)
+     * @param asynchronous 是否采用异步调用，默认false。(其实就是是否使用"setTimeout(listener, 0)"来调用监听器)
      */
-    trigger(eventName: string | string[], data?: any, includeChildren?: boolean, asynchronous?: boolean): void;
+    trigger(eventName: string | string[], data?: any, asynchronous?: boolean): void;
     send: EventSpaceType['trigger'];
     /**
-     * 触发从根到指定级别在内的所有事件监听器。跟trigger的方向正好相反。注意，监听器执行的顺序是先从根开始。
+     * 触发指定级别的所有下级的事件监听器。可以传递一个includeSelf来指示是否要同时触发自身的事件监听器，默认true。
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      * @param data 要传递的数据
-     * @param asynchronous 是否异步调用，默认false。(其实就是是否使用"setTimeout(listener, 0)"来调用监听器)
+     * @param includeSelf 是否要同时触发自身的事件监听器，默认true
+     * @param asynchronous 是否采用异步调用，默认false。(其实就是是否使用"setTimeout(listener, 0)"来调用监听器)
      */
-    triggerReverse(eventName: string | string[], data?: any, asynchronous?: boolean): void;
-    sendReverse: EventSpaceType['triggerReverse'];
+    triggerDescendants(eventName: string | string[], data?: any, includeSelf?: boolean, asynchronous?: boolean): void;
+    sendDescendants: EventSpaceType['triggerDescendants'];
     /**
-     * 判断指定级别是否注册的有事件监听器
+     * 触发从根到指定级别的所有事件监听器。注意，监听器执行的顺序是先从根开始。可以传递一个includeSelf来指示是否要同时触发自身的事件监听器，默认true。
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
-     * @param includeChildren 是否包含其子级，默认true
+     * @param data 要传递的数据
+     * @param includeSelf 是否要同时触发自身的事件监听器，默认true
+     * @param asynchronous 是否采用异步调用，默认false。(其实就是是否使用"setTimeout(listener, 0)"来调用监听器)
      */
-    has(eventName: string | string[], includeChildren?: boolean): boolean;
+    triggerAncestors(eventName: string | string[], data?: any, includeSelf?: boolean, asynchronous?: boolean): void;
+    sendAncestors: EventSpaceType['triggerAncestors'];
     /**
-     * 判断指定级别是否注册的有特定事件监听器
+     * 判断指定级别是否注册的有事件监听器。可以传递一个listener来判断是否注册的有特定事件监听器
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
-     * @param listener 事件监听器
+     * @param listener 要进行判断的特定事件监听器
      */
-    has(eventName: string | string[], listener: Listener): boolean;
+    has(eventName: string | string[], listener?: Listener): boolean;
     /**
-     * 判断从根到指定级别在内是否注册的有事件监听器。跟has的方向正好相反。
-     * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
+     * 判断指定级别的下级是否注册的有事件监听器。可以传递一个includeSelf来指示是否要同时判断自身，默认true。
+     * @param eventName 事件名称,可以为字符串或数组(字符串通过‘.’来分割层级)。
+     * @param includeSelf 指示是否要同时判断自身，默认true。
      */
-    hasReverse(eventName: string | string[]): boolean;
+    hasDescendants(eventName: string | string[], includeSelf?: boolean): boolean;
+    /**
+     * 判断指定级别的上级是否注册的有事件监听器。可以传递一个includeSelf来指示是否要同时判断自身，默认true。
+     * @param eventName 事件名称,可以为字符串或数组(字符串通过‘.’来分割层级)。
+     * @param includeSelf 指示是否要同时判断自身，默认true。
+     */
+    hasAncestors(eventName: string | string[], includeSelf?: boolean): boolean;
 }

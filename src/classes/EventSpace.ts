@@ -1,6 +1,6 @@
 import { EventSpaceType } from './../interfaces/EventSpaceType';
-import { EventLevel } from "./EventLevel";
 import { Listener } from '../interfaces/ListenerType';
+import { EventLevel } from "./EventLevel";
 
 export class EventSpace implements EventSpaceType {
     /**
@@ -15,7 +15,7 @@ export class EventSpace implements EventSpaceType {
 
     receive = <T extends Listener>(eventName: string | string[], listener: T) => {
         this._eventLevel
-            .getChild(EventSpace.convertEventNameType(eventName), true)
+            .getChildLevel(EventSpace.convertEventNameType(eventName), true)
             .receivers.add(listener);
 
         return listener;
@@ -23,7 +23,7 @@ export class EventSpace implements EventSpaceType {
     on = this.receive;
 
     receiveOnce = <T extends Listener>(eventName: string | string[], listener: T) => {
-        const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), true);
+        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), true);
         level.receivers.add(function once(data) {
             listener(data);
             level.receivers.delete(once);
@@ -33,112 +33,118 @@ export class EventSpace implements EventSpaceType {
     }
     once = this.receiveOnce;
 
-    cancel = (eventName: string | string[] = [], lrc: boolean | Listener = true) => {
-        const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
-        if (level !== undefined) {
-            if (lrc === true) {
-                level.receivers.clear();
-                level.children.clear();
-            } else if (lrc === false) {
-                level.receivers.clear();
-            } else {
-                level.receivers.delete(lrc);
-            }
-        }
+    cancel = (eventName: string | string[] = [], listener?: Listener) => {
+        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        if (level !== undefined)
+            if (listener !== undefined) level.receivers.delete(listener); else level.receivers.clear();
     }
     off = this.cancel;
 
-    cancelReverse = (eventName: string | string[]) => {
-        let level = this._eventLevel;
-        level.receivers.clear();
-
-        for (const currentName of EventSpace.convertEventNameType(eventName)) {
-            const currentLevel = level.children.get(currentName);
-            if (currentLevel !== undefined) {
-                currentLevel.receivers.clear();
-                level = currentLevel;
-            } else {
-                return;
-            }
+    cancelDescendants = (eventName: string | string[] = [], includeSelf: boolean = true) => {
+        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        if (level !== undefined) {
+            if (includeSelf) level.receivers.clear();
+            level.children.clear();
         }
     }
-    offReverse = this.cancelReverse;
+    offDescendants = this.cancelDescendants;
 
-    trigger = (eventName: string | string[], data?: any, includeChildren: boolean = true, asynchronous?: boolean) => {
-        const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
-        if (level !== undefined) {
-            level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+    cancelAncestors = (eventName: string | string[] = [], includeSelf: boolean = true) => {
+        eventName = EventSpace.convertEventNameType(eventName);
+        let level = this._eventLevel;
 
-            if (includeChildren) {
-                function triggerChildren(level: EventLevel) {
-                    level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
-                    level.children.forEach(triggerChildren);
-                }
-                level.children.forEach(triggerChildren);
-            }
+        for (var index = 0; index < eventName.length; index++) {
+            level.receivers.clear();
+
+            const currentLevel = level.children.get(eventName[index]);
+            if (currentLevel !== undefined) level = currentLevel; else break;
         }
+
+        if (includeSelf && index === eventName.length) level.receivers.clear();
+    }
+    offAncestors = this.cancelAncestors;
+
+    trigger = (eventName: string | string[], data?: any, asynchronous?: boolean) => {
+        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        if (level !== undefined)
+            level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
     }
     send = this.trigger;
 
-    triggerReverse = (eventName: string | string[], data?: any, asynchronous?: boolean) => {
-        let level = this._eventLevel;
-        level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+    triggerDescendants = (eventName: string | string[], data?: any, includeSelf: boolean = true, asynchronous?: boolean) => {
+        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        if (level !== undefined) {
+            if (includeSelf) level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
 
-        for (const currentName of EventSpace.convertEventNameType(eventName)) {
-            const currentLevel = level.children.get(currentName);
-            if (currentLevel !== undefined) {
-                currentLevel.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
-                level = currentLevel;
-            } else {
-                return;
+            function triggerChildren(level: EventLevel) {
+                level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+                level.children.forEach(triggerChildren);
             }
+            level.children.forEach(triggerChildren);
         }
     }
-    sendReverse = this.triggerReverse;
+    sendDescendants = this.triggerDescendants;
 
-    has = (eventName: string | string[], lrc: boolean | Listener = true) => {
-        const level = this._eventLevel.getChild(EventSpace.convertEventNameType(eventName), false);
-        if (level === undefined) {
-            return false;
-        } else {
-            if (lrc === true) {
-                function checkChildren(level: EventLevel) {
-                    if (level.receivers.size > 0) {
-                        return true;
-                    } else {
-                        for (const item of level.children.values()) {
-                            if (checkChildren(item))
-                                return true;
-                        }
-                        return false;
-                    }
-                }
+    triggerAncestors = (eventName: string | string[], data?: any, includeSelf: boolean = true, asynchronous?: boolean) => {
+        eventName = EventSpace.convertEventNameType(eventName);
+        let level = this._eventLevel;
 
-                return checkChildren(level);
-            } else if (lrc === false) {
+        for (var index = 0; index < eventName.length; index++) {
+            level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+
+            const currentLevel = level.children.get(eventName[index]);
+            if (currentLevel !== undefined) level = currentLevel; else break;
+        }
+
+        if (includeSelf && index === eventName.length)
+            level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
+    }
+    sendAncestors = this.triggerAncestors;
+
+    has = (eventName: string | string[], listener?: Listener) => {
+        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        if (level !== undefined) {
+            if (listener !== undefined)
+                return level.receivers.has(listener);
+            else
                 return level.receivers.size > 0;
-            } else {
-                return level.receivers.has(lrc);
-            }
-        }
+        } else return false;
     }
 
-    hasReverse = (eventName: string | string[]) => {
-        let level = this._eventLevel;
-        if (level.receivers.size > 0) {
-            return true;
-        } else {
-            for (const currentName of EventSpace.convertEventNameType(eventName)) {
-                const currentLevel = level.children.get(currentName);
-                if (currentLevel !== undefined) {
-                    if (currentLevel.receivers.size > 0)
-                        return true;
+    hasDescendants = (eventName: string | string[], includeSelf: boolean = true) => {
+        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        if (level !== undefined) {
+            if (includeSelf && level.receivers.size > 0) return true;
+
+            function checkChildren(level: EventLevel) {
+                if (level.receivers.size > 0) {
+                    return true;
                 } else {
+                    for (const item of level.children.values())
+                        if (checkChildren(item)) return true;
+
                     return false;
                 }
-                level = currentLevel;
             }
+
+            for (const item of level.children.values())
+                if (checkChildren(item)) return true;
+
             return false;
+        } else return false;
+    }
+
+    hasAncestors = (eventName: string | string[], includeSelf: boolean = true) => {
+        eventName = EventSpace.convertEventNameType(eventName);
+        let level = this._eventLevel;
+
+        for (var index = 0; index < eventName.length; index++) {
+            if (level.receivers.size > 0) return true;
+
+            const currentLevel = level.children.get(eventName[index]);
+            if (currentLevel !== undefined) level = currentLevel; else return false;
         }
+
+        if (includeSelf) return level.receivers.size > 0; else return false;
     }
 }

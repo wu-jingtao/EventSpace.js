@@ -27,13 +27,13 @@ export class EventLevel {
      * 相对当前层，根据层名称数组获取子层，如果不存在就返回空
      * @param levelNameArray 层名称数组
      */
-    getChild(levelNameArray: string[], autoCreateLevel: false): EventLevel | undefined
+    getChildLevel(levelNameArray: string[], autoCreateLevel: false): EventLevel | undefined
     /**
      * 相对当前层，根据层名称数组获取子层，如果不存在就自动创建
      * @param levelNameArray 层名称数组
      */
-    getChild(levelNameArray: string[], autoCreateLevel: true): EventLevel
-    getChild(levelNameArray: string[], autoCreateLevel: boolean) {
+    getChildLevel(levelNameArray: string[], autoCreateLevel: true): EventLevel
+    getChildLevel(levelNameArray: string[], autoCreateLevel: boolean) {
         let level: EventLevel = this;
 
         for (const currentName of levelNameArray) {
