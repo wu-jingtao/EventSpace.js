@@ -1,12 +1,13 @@
 import { EventSpaceType } from '../interfaces/EventSpaceType';
 import { Listener } from '../interfaces/ListenerType';
+import { EventLevel } from "./EventLevel";
 export declare class EventSpace implements EventSpaceType {
     /**
      * 将事件名转换成数组的形式
      * @param eventName 事件名称
      */
     static convertEventNameType(eventName: string | string[]): string[];
-    private readonly _eventLevel;
+    readonly _eventLevel: EventLevel;
     receive: <T extends Listener>(eventName: string | string[], listener: T) => T;
     on: <T extends Listener>(eventName: string | string[], listener: T) => T;
     receiveOnce: <T extends Listener>(eventName: string | string[], listener: T) => T;

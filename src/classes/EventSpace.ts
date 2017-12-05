@@ -11,7 +11,7 @@ export class EventSpace implements EventSpaceType {
         return Array.isArray(eventName) ? eventName : eventName.split('.');
     }
 
-    private readonly _eventLevel = new EventLevel();
+    readonly _eventLevel = new EventLevel();
 
     receive = <T extends Listener>(eventName: string | string[], listener: T) => {
         this._eventLevel

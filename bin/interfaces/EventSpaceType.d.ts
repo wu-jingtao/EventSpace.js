@@ -1,5 +1,10 @@
 import { Listener } from "./ListenerType";
+import { EventLevel } from "../classes/EventLevel";
 export interface EventSpaceType {
+    /**
+     * 保存着每个层级上的事件监听器
+     */
+    readonly _eventLevel: EventLevel;
     /**
      * 注册事件监听器（别名 on）
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
