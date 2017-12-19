@@ -15,22 +15,27 @@ export class EventLevel {
     readonly children: Map<string, EventLevel> = new Map();
 
     /**
-     * 当前层的事件监听器
+     * 当前层注册的事件监听器
      */
     readonly receivers: Set<Listener> = new Set();
+
+    /**
+     * 供用户保存一些自定义数据
+     */
+    data: any;
 
     constructor(parent?: EventLevel) {
         this.parent = parent;
     }
 
     /**
-     * 相对当前层，根据层名称数组获取子层，如果不存在就返回空
-     * @param levelNameArray 层名称数组
+     * 相对当前层，根据名称数组获取子层，如果不存在就返回空
+     * @param levelNameArray 名称数组
      */
     getChildLevel(levelNameArray: string[], autoCreateLevel: false): EventLevel | undefined
     /**
-     * 相对当前层，根据层名称数组获取子层，如果不存在就自动创建
-     * @param levelNameArray 层名称数组
+     * 相对当前层，根据名称数组获取子层，如果不存在就自动创建
+     * @param levelNameArray 名称数组
      */
     getChildLevel(levelNameArray: string[], autoCreateLevel: true): EventLevel
     getChildLevel(levelNameArray: string[], autoCreateLevel: boolean) {
