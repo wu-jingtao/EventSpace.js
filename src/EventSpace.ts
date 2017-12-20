@@ -1,19 +1,63 @@
-import { EventLevel } from "./EventLevel";
+import { EventLevel, Listener } from "./EventLevel";
 
-export class EventSpace implements EventSpaceType {
+/**
+ * 事件名称类型
+ */
+export type EventName = string | string[];
+
+export class EventSpace<T>{
+
     /**
      * 将事件名转换成数组的形式
      * @param eventName 事件名称
      */
-    static convertEventNameType(eventName: string | string[]) {
+    static convertEventNameType(eventName: EventName) {
         return Array.isArray(eventName) ? eventName : eventName.split('.');
     }
 
-    readonly _eventLevel = new EventLevel();
+    /**
+     * 事件层级
+     */
+    readonly eventLevel = new EventLevel<T>('');
+
+    /**
+     * 根据事件名获取特定的事件层级，如果不存在就返回空。注意：根的eventName是空数组而不是空字符串
+     * @param eventName 事件名称
+     */
+    getChildren(eventName: EventName, autoCreateLevel: false): EventLevel<T> | undefined
+    /**
+     * 根据事件名获取特定的事件层级，如果不存在就自动创建
+     * @param eventName 事件名称
+     */
+    getChildren(eventName: EventName, autoCreateLevel: true): EventLevel<T>
+    getChildren(eventName: EventName, autoCreateLevel: boolean) {
+        let level = this.eventLevel;
+
+        for (const currentName of EventSpace.convertEventNameType(eventName)) {
+            let currentLevel = level.children.get(currentName);
+
+            if (currentLevel === undefined) {
+                if (autoCreateLevel) {
+                    currentLevel = new EventLevel(currentName, level);
+                    level.children.set(currentName, currentLevel);
+                } else {
+                    return undefined;
+                }
+            }
+
+            level = currentLevel;
+        }
+
+        return level;
+    }
+
+    forEachDescendants(eventName: EventName, ) {
+
+    }
 
     receive = <T extends Listener>(eventName: string | string[], listener: T) => {
         this._eventLevel
-            .getChildLevel(EventSpace.convertEventNameType(eventName), true)
+            .getChildren(EventSpace.convertEventNameType(eventName), true)
             .receivers.add(listener);
 
         return listener;
@@ -21,7 +65,7 @@ export class EventSpace implements EventSpaceType {
     on = this.receive;
 
     receiveOnce = <T extends Listener>(eventName: string | string[], listener: T) => {
-        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), true);
+        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), true);
         level.receivers.add(function once(data) {
             listener(data);
             level.receivers.delete(once);
@@ -32,7 +76,7 @@ export class EventSpace implements EventSpaceType {
     once = this.receiveOnce;
 
     cancel = (eventName: string | string[] = [], listener?: Listener) => {
-        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined)
             if (listener !== undefined)
                 level.receivers.delete(listener);
@@ -42,7 +86,7 @@ export class EventSpace implements EventSpaceType {
     off = this.cancel;
 
     cancelDescendants = (eventName: string | string[] = [], includeSelf: boolean = true) => {
-        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
             if (includeSelf) level.receivers.clear();
             level.children.clear();
@@ -68,14 +112,14 @@ export class EventSpace implements EventSpaceType {
     offAncestors = this.cancelAncestors;
 
     trigger = (eventName: string | string[], data?: any, asynchronous?: boolean) => {
-        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined)
             level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
     }
     send = this.trigger;
 
     triggerDescendants = (eventName: string | string[], data?: any, includeSelf: boolean = true, asynchronous?: boolean) => {
-        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
             if (includeSelf) level.receivers.forEach(item => asynchronous ? setTimeout(item, 0, data) : item(data));
 
@@ -106,7 +150,7 @@ export class EventSpace implements EventSpaceType {
     sendAncestors = this.triggerAncestors;
 
     has = (eventName: string | string[], listener?: Listener) => {
-        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
             if (listener !== undefined)
                 return level.receivers.has(listener);
@@ -117,7 +161,7 @@ export class EventSpace implements EventSpaceType {
     }
 
     hasDescendants = (eventName: string | string[], includeSelf: boolean = true) => {
-        const level = this._eventLevel.getChildLevel(EventSpace.convertEventNameType(eventName), false);
+        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
             if (includeSelf && level.receivers.size > 0) return true;
 
@@ -157,36 +201,5 @@ export class EventSpace implements EventSpaceType {
             return level.receivers.size > 0;
         else
             return false;
-    }
-    
-    /**
-     * 相对当前层，根据名称数组获取子层，如果不存在就返回空
-     * @param levelNameArray 名称数组
-     */
-    getChildLevel(levelNameArray: string[], autoCreateLevel: false): EventLevel | undefined
-    /**
-     * 相对当前层，根据名称数组获取子层，如果不存在就自动创建
-     * @param levelNameArray 名称数组
-     */
-    getChildLevel(levelNameArray: string[], autoCreateLevel: true): EventLevel
-    getChildLevel(levelNameArray: string[], autoCreateLevel: boolean) {
-        let level: EventLevel = this;
-
-        for (const currentName of levelNameArray) {
-            let currentLevel = level.children.get(currentName);
-
-            if (currentLevel === undefined) {
-                if (autoCreateLevel) {
-                    currentLevel = new EventLevel(level);
-                    level.children.set(currentName, currentLevel);
-                } else {
-                    return undefined;
-                }
-            }
-
-            level = currentLevel;
-        }
-
-        return level;
     }
 }

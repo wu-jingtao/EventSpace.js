@@ -1,9 +1,4 @@
 /**
- * 事件监听器回调函数
- */
-export type Listener = (data?: any) => any;
-
-/**
  * 事件层
  */
 export class EventLevel<T> {
@@ -16,14 +11,31 @@ export class EventLevel<T> {
     /**
      * 当前层注册的事件监听器
      */
-    readonly receivers: Set<Listener> = new Set();
+    readonly receivers: Set<(data: any, currentLevel: EventLevel<T>) => any> = new Set();
 
     /**
      * 供用户保存一些自定义数据
      */
-    data: T;
+    data?: T;
+
+    /**
+     * 获取当前层的完整事件名称
+     */
+    get fullName(): string[] {
+        if (this.parent) {
+            const result = this.parent.fullName
+            result.push(this.name);
+            return result;
+        } else
+            return [];
+    }
 
     constructor(
+        /**
+         * 当前层级的名称。根的名称为空字符串
+         */
+        readonly name: string,
+
         /**
          * 父层。根的父层为undefined   
          */
