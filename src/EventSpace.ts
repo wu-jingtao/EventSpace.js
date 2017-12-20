@@ -2,6 +2,12 @@
  * 事件监听器
  */
 export interface Listener<T> {
+
+    /**
+     * 这个主要是给receiveOnce这种情况使用的，保留一个原始的listener
+     */
+    _es_original?: (data: any, layer: EventSpace<T>) => any;
+
     /**
      * @param data 传递的数据
      * @param layer 监听器所在层的引用
@@ -154,13 +160,13 @@ export default class EventSpace<T> {
      * 相对于当前层，根据事件名称获取特定的子层，如果不存在就返回空。
      * @param eventName 事件名称
      */
-    getChild(eventName: EventName, autoCreateLayer: false): EventSpace<T> | undefined
+    getChild(eventName: EventName, autoCreateLayer?: false): EventSpace<T> | undefined
     /**
      * 相对于当前层，根据事件名称获取特定的子层，如果不存在就自动创建。
      * @param eventName 事件名称
      */
     getChild(eventName: EventName, autoCreateLayer: true): EventSpace<T>
-    getChild(eventName: EventName, autoCreateLayer: boolean) {
+    getChild(eventName: EventName, autoCreateLayer?: boolean) {
         let layer: EventSpace<T> = this;
 
         for (const currentName of convertEventNameType(eventName)) {
@@ -334,5 +340,60 @@ export default class EventSpace<T> {
 
     //#endregion
 
-    
+    //#region 事件操作方法
+
+    receive<P extends Listener<T>>(eventName: EventName, listener: P): P {
+        const layer = this.getChild(eventName, true);
+
+        if (layer._listeners.size < layer._listeners.add(listener).size) { //确保有新的监听器被添加
+            if (listener.name === '_es_once_') listener = listener._es_original as any;
+
+            layer._onAddListenerCallback.forEach(cb => cb(listener, layer));
+            layer.forEachChildren(layer => layer._onAncestorAddListenerCallback.forEach(cb => cb(listener, layer)));
+            layer.forEachParents(layer => layer._onDescendantsAddListenerCallback.forEach(cb => cb(listener, layer)));
+        }
+
+        return listener;
+    }
+
+    receiveOnce<P extends Listener<T>>(eventName: EventName, listener: P): P {
+        const _es_once_: Listener<T> = (data, layer) => {
+            listener(data, layer);
+            layer.cancel([], _es_once_);
+        };
+
+        _es_once_._es_original = listener;
+
+        this.receive(eventName, _es_once_);
+
+        return listener;
+    }
+
+    cancel(eventName: EventName = [], listener?: Listener<T>): void {
+        const layer = this.getChild(eventName);
+
+        if (layer) {
+            if (listener) {
+                if (layer._listeners.delete(listener)) {
+                    if (listener.name === '_es_once_') listener = listener._es_original;
+
+                    layer._onRemoveListenerCallback.forEach(cb => cb(listener as any, layer));
+                    layer.forEachChildren(layer => layer._onAncestorRemoveListenerCallback.forEach(cb => cb(listener as any, layer)));
+                    layer.forEachParents(layer => layer._onDescendantsRemoveListenerCallback.forEach(cb => cb(listener as any, layer)));
+                }
+            } else {
+                layer._listeners.forEach(listener => {
+                    layer._listeners.delete(listener);
+
+                    if (listener.name === '_es_once_') listener = listener._es_original as any;
+
+                    layer._onRemoveListenerCallback.forEach(cb => cb(listener, layer));
+                    layer.forEachChildren(layer => layer._onAncestorRemoveListenerCallback.forEach(cb => cb(listener, layer)));
+                    layer.forEachParents(layer => layer._onDescendantsRemoveListenerCallback.forEach(cb => cb(listener, layer)));
+                });
+            }
+        }
+    }
+
+    //#endregion
 }
