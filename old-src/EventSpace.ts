@@ -7,49 +7,12 @@ export type EventName = string | string[];
 
 export class EventSpace<T>{
 
-    /**
-     * 将事件名转换成数组的形式
-     * @param eventName 事件名称
-     */
-    static convertEventNameType(eventName: EventName) {
-        return Array.isArray(eventName) ? eventName : eventName.split('.');
-    }
+
 
     /**
      * 事件层级
      */
     readonly eventLevel = new EventLevel<T>('');
-
-    /**
-     * 根据事件名获取特定的事件层级，如果不存在就返回空。注意：根的eventName是空数组而不是空字符串
-     * @param eventName 事件名称
-     */
-    getChildren(eventName: EventName, autoCreateLevel: false): EventLevel<T> | undefined
-    /**
-     * 根据事件名获取特定的事件层级，如果不存在就自动创建
-     * @param eventName 事件名称
-     */
-    getChildren(eventName: EventName, autoCreateLevel: true): EventLevel<T>
-    getChildren(eventName: EventName, autoCreateLevel: boolean) {
-        let level = this.eventLevel;
-
-        for (const currentName of EventSpace.convertEventNameType(eventName)) {
-            let currentLevel = level.children.get(currentName);
-
-            if (currentLevel === undefined) {
-                if (autoCreateLevel) {
-                    currentLevel = new EventLevel(currentName, level);
-                    level.children.set(currentName, currentLevel);
-                } else {
-                    return undefined;
-                }
-            }
-
-            level = currentLevel;
-        }
-
-        return level;
-    }
 
     forEachDescendants(eventName: EventName, ) {
 
