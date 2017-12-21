@@ -32,7 +32,8 @@ export interface AddOrRemoveListenerCallback<T> {
 export type EventName = string | string[];
 
 /**
- * 将事件名转换成数组的形式
+ * 将事件名转换成数组的形式    
+ * 注意：空字符串将会被转换成空数组
  * @param eventName 事件名称
  */
 export function convertEventNameType(eventName: EventName) {
@@ -66,12 +67,12 @@ export default class EventSpace<T> {
     /**
      * 相对于当前层，当父层有新的事件监听器被添加时触发的回调函数
      */
-    private readonly _onAncestorAddListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
+    private readonly _onAncestorsAddListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
     /**
      * 相对于当前层，当父层有事件监听器被删除时触发的回调函数
      */
-    private readonly _onAncestorRemoveListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
+    private readonly _onAncestorsRemoveListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
     /**
      * 相对于当前层，当子层有新的事件监听器被添加时触发的回调函数
@@ -120,16 +121,16 @@ export default class EventSpace<T> {
     /**
      * 当前层注册了多少监听器
      */
-    get count(): number {
+    get listenerCount(): number {
         return this._listeners.size;
     }
 
     /**
      * 相对于当前层，获取所有父层上注册了多少监听器。(不包括当前层)
      */
-    get ancestorListenerCount(): number {
+    get ancestorsListenerCount(): number {
         if (this.parent)
-            return this.parent.ancestorListenerCount + this.parent._listeners.size;
+            return this.parent.ancestorsListenerCount + this.parent._listeners.size;
         else
             return 0;
     }
@@ -188,34 +189,34 @@ export default class EventSpace<T> {
     }
 
     /**
-     * 相对于当前层，循环遍历每一个子层。返回boolean，用于判断遍历是否中断。     
-     * 提示：如果把callback作为判断条件，可以将forEachChildren模拟成includes来使用
+     * 相对于当前层，循环遍历每一个子层。返回boolean，用于判断遍历是否发生中断。     
+     * 提示：如果把callback作为判断条件，可以将forEachDescendants模拟成includes来使用
      * @param callback 回调。返回true则终止遍历
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    forEachChildren(callback: (layer: EventSpace<T>) => void | boolean, includeCurrentLayer: boolean = false): boolean {
+    forEachDescendants(callback: (layer: EventSpace<T>) => void | boolean, includeCurrentLayer: boolean = false): boolean {
         if (includeCurrentLayer)
             if (callback(this)) return true;
 
         for (const item of this.children.values()) {
-            if (item.forEachChildren(callback, true)) return true;
+            if (item.forEachDescendants(callback, true)) return true;
         }
 
         return false;
     }
 
     /**
-     * 相对于当前层，循环遍历每一个父层。返回boolean，用于判断遍历是否中断。     
-     * 提示：如果把callback作为判断条件，可以将forEachParents模拟成includes来使用
+     * 相对于当前层，循环遍历每一个父层。返回boolean，用于判断遍历是否发生中断。     
+     * 提示：如果把callback作为判断条件，可以将forEachAncestors模拟成includes来使用
      * @param callback 回调。返回true则终止遍历
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    forEachParents(callback: (layer: EventSpace<T>) => void | boolean, includeCurrentLayer: boolean = false): boolean {
+    forEachAncestors(callback: (layer: EventSpace<T>) => void | boolean, includeCurrentLayer: boolean = false): boolean {
         if (includeCurrentLayer)
             if (callback(this)) return true;
 
         if (this.parent)
-            return this.parent.forEachParents(callback, true);
+            return this.parent.forEachAncestors(callback, true);
         else
             return false;
     }
@@ -227,7 +228,7 @@ export default class EventSpace<T> {
      * @param callback undefined
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    mapChildren(callback?: undefined, includeCurrentLayer?: boolean): EventSpace<T>[]
+    mapDescendants(callback?: undefined, includeCurrentLayer?: boolean): EventSpace<T>[]
     /**
      * 相对于当前层，遍历每一个子层，将每一次遍历的结果保存到一个数组中。    
      * 注意：子层的数目随时可能会变化，因为可能会有监听器在新的子层上注册
@@ -235,11 +236,11 @@ export default class EventSpace<T> {
      * @param callback 回调
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    mapChildren<P>(callback: (layer: EventSpace<T>) => P, includeCurrentLayer?: boolean): P[]
-    mapChildren(callback?: Function, includeCurrentLayer?: boolean): any[] {
+    mapDescendants<P>(callback: (layer: EventSpace<T>) => P, includeCurrentLayer?: boolean): P[]
+    mapDescendants(callback?: Function, includeCurrentLayer?: boolean): any[] {
         const result: any[] = [];
 
-        this.forEachChildren(layer => {
+        this.forEachDescendants(layer => {
             if (callback)
                 result.push(callback(layer));
             else
@@ -254,17 +255,17 @@ export default class EventSpace<T> {
      * @param callback undefined
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    mapParents(callback?: undefined, includeCurrentLayer?: boolean): EventSpace<T>[]
+    mapAncestors(callback?: undefined, includeCurrentLayer?: boolean): EventSpace<T>[]
     /**
      * 相对于当前层，遍历每一个父层，将每一次遍历的结果保存到一个数组中。    
      * @param callback 回调
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    mapParents<P>(callback: (layer: EventSpace<T>) => P, includeCurrentLayer?: boolean): P[]
-    mapParents(callback?: Function, includeCurrentLayer?: boolean): any[] {
+    mapAncestors<P>(callback: (layer: EventSpace<T>) => P, includeCurrentLayer?: boolean): P[]
+    mapAncestors(callback?: Function, includeCurrentLayer?: boolean): any[] {
         const result: any[] = [];
 
-        this.forEachParents(layer => {
+        this.forEachAncestors(layer => {
             if (callback)
                 result.push(callback(layer));
             else
@@ -280,10 +281,10 @@ export default class EventSpace<T> {
      * @param initial 初始值
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    reduceChildren<P>(callback: (previous: P, layer: EventSpace<T>) => P, initial: P, includeCurrentLayer?: boolean): P {
+    reduceDescendants<P>(callback: (previous: P, layer: EventSpace<T>) => P, initial: P, includeCurrentLayer?: boolean): P {
         let result = initial;
 
-        this.forEachChildren(layer => { result = callback(result, layer) }, includeCurrentLayer);
+        this.forEachDescendants(layer => { result = callback(result, layer) }, includeCurrentLayer);
 
         return result;
     }
@@ -294,10 +295,10 @@ export default class EventSpace<T> {
      * @param initial 初始值
      * @param includeCurrentLayer 是否包含当前层，默认false
      */
-    reduceParents<P>(callback: (previous: P, layer: EventSpace<T>) => P, initial: P, includeCurrentLayer?: boolean): P {
+    reduceAncestors<P>(callback: (previous: P, layer: EventSpace<T>) => P, initial: P, includeCurrentLayer?: boolean): P {
         let result = initial;
 
-        this.forEachParents(layer => { result = callback(result, layer) }, includeCurrentLayer);
+        this.forEachAncestors(layer => { result = callback(result, layer) }, includeCurrentLayer);
 
         return result;
     }
@@ -310,7 +311,7 @@ export default class EventSpace<T> {
     findChild(callback: (layer: EventSpace<T>) => boolean, includeCurrentLayer?: boolean): EventSpace<T> | undefined {
         let result: EventSpace<T> | undefined;
 
-        this.forEachChildren(layer => {
+        this.forEachDescendants(layer => {
             if (callback(layer)) {
                 result = layer;
                 return true;
@@ -328,7 +329,7 @@ export default class EventSpace<T> {
     findParent(callback: (layer: EventSpace<T>) => boolean, includeCurrentLayer?: boolean): EventSpace<T> | undefined {
         let result: EventSpace<T> | undefined;
 
-        this.forEachParents(layer => {
+        this.forEachAncestors(layer => {
             if (callback(layer)) {
                 result = layer;
                 return true;
@@ -342,54 +343,69 @@ export default class EventSpace<T> {
 
     //#region 事件操作方法
 
+    /**
+     * 注册事件监听器
+     * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
+     * @param listener 事件监听器
+     */
     receive<P extends Listener<T>>(eventName: EventName, listener: P): P {
         const layer = this.getChild(eventName, true);
 
         if (layer._listeners.size < layer._listeners.add(listener).size) { //确保有新的监听器被添加
-            if (listener.name === '_es_once_') listener = listener._es_original as any;
+            if (listener._es_original) listener = listener._es_original as any;
 
             layer._onAddListenerCallback.forEach(cb => cb(listener, layer));
-            layer.forEachChildren(layer => layer._onAncestorAddListenerCallback.forEach(cb => cb(listener, layer)));
-            layer.forEachParents(layer => layer._onDescendantsAddListenerCallback.forEach(cb => cb(listener, layer)));
+            layer.forEachDescendants(layer => layer._onAncestorsAddListenerCallback.forEach(cb => cb(listener, layer)));
+            layer.forEachAncestors(layer => layer._onDescendantsAddListenerCallback.forEach(cb => cb(listener, layer)));
         }
 
         return listener;
     }
 
+    /**
+     * 注册只使用一次的事件监听器
+     * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
+     * @param listener 事件监听器
+     */
     receiveOnce<P extends Listener<T>>(eventName: EventName, listener: P): P {
-        const _es_once_: Listener<T> = (data, layer) => {
+        const once: Listener<T> = (data, layer) => {
             listener(data, layer);
-            layer.cancel([], _es_once_);
+            layer.cancel([], once);
         };
 
-        _es_once_._es_original = listener;
+        once._es_original = listener;
 
-        this.receive(eventName, _es_once_);
+        this.receive(eventName, once);
 
         return listener;
     }
 
+    /**
+     * 清除指定级别的所有事件监听器。可以传递一个listener来只清除一个特定的事件监听器
+     * @param eventName 事件名称,可以为字符串或数组(字符串通过‘.’来分割层级)。默认 []
+     * @param listener 要清除的特定事件监听器
+     */
     cancel(eventName: EventName = [], listener?: Listener<T>): void {
         const layer = this.getChild(eventName);
 
         if (layer) {
             if (listener) {
                 if (layer._listeners.delete(listener)) {
-                    if (listener.name === '_es_once_') listener = listener._es_original;
+                    if (listener._es_original) listener = listener._es_original;
 
                     layer._onRemoveListenerCallback.forEach(cb => cb(listener as any, layer));
-                    layer.forEachChildren(layer => layer._onAncestorRemoveListenerCallback.forEach(cb => cb(listener as any, layer)));
-                    layer.forEachParents(layer => layer._onDescendantsRemoveListenerCallback.forEach(cb => cb(listener as any, layer)));
+                    layer.forEachDescendants(layer => layer._onAncestorsRemoveListenerCallback.forEach(cb => cb(listener as any, layer)));
+                    layer.forEachAncestors(layer => layer._onDescendantsRemoveListenerCallback.forEach(cb => cb(listener as any, layer)));
                 }
             } else {
                 layer._listeners.forEach(listener => {
                     layer._listeners.delete(listener);
 
-                    if (listener.name === '_es_once_') listener = listener._es_original as any;
+                    if (listener._es_original) listener = listener._es_original;
 
                     layer._onRemoveListenerCallback.forEach(cb => cb(listener, layer));
-                    layer.forEachChildren(layer => layer._onAncestorRemoveListenerCallback.forEach(cb => cb(listener, layer)));
-                    layer.forEachParents(layer => layer._onDescendantsRemoveListenerCallback.forEach(cb => cb(listener, layer)));
+                    layer.forEachDescendants(layer => layer._onAncestorsRemoveListenerCallback.forEach(cb => cb(listener, layer)));
+                    layer.forEachAncestors(layer => layer._onDescendantsRemoveListenerCallback.forEach(cb => cb(listener, layer)));
                 });
             }
         }

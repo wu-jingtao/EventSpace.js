@@ -9,45 +9,6 @@ export class EventSpace<T>{
 
 
 
-    /**
-     * 事件层级
-     */
-    readonly eventLevel = new EventLevel<T>('');
-
-    forEachDescendants(eventName: EventName, ) {
-
-    }
-
-    receive = <T extends Listener>(eventName: string | string[], listener: T) => {
-        this._eventLevel
-            .getChildren(EventSpace.convertEventNameType(eventName), true)
-            .receivers.add(listener);
-
-        return listener;
-    }
-    on = this.receive;
-
-    receiveOnce = <T extends Listener>(eventName: string | string[], listener: T) => {
-        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), true);
-        level.receivers.add(function once(data) {
-            listener(data);
-            level.receivers.delete(once);
-        });
-
-        return listener;
-    }
-    once = this.receiveOnce;
-
-    cancel = (eventName: string | string[] = [], listener?: Listener) => {
-        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
-        if (level !== undefined)
-            if (listener !== undefined)
-                level.receivers.delete(listener);
-            else
-                level.receivers.clear();
-    }
-    off = this.cancel;
-
     cancelDescendants = (eventName: string | string[] = [], includeSelf: boolean = true) => {
         const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
         if (level !== undefined) {
