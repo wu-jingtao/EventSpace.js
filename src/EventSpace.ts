@@ -132,8 +132,13 @@ export default class EventSpace<T> {
         this.name = name;
 
         //-------- 清理不再被使用的层 ---------
-        let nextClear = (new Date).getTime() + EventSpace._gc_interval;   //下一次清理的最早时间
-        this
+        let nextClearTime = (new Date).getTime() + EventSpace._gc_interval;   //下一次清理的最早时间
+        this.on('descendantsRemoveListener', (listener, layer) => {
+            if ((new Date).getTime() > nextClearTime) {
+                this._clearNoLongerUsedLayer();
+                nextClearTime = (new Date).getTime() + EventSpace._gc_interval;
+            }
+        });
     }
 
     //#endregion
@@ -507,6 +512,122 @@ export default class EventSpace<T> {
     hasAncestors(listener: Listener<T>, includeSelf?: boolean): boolean
     hasAncestors(listener?: any, includeSelf: boolean = true): boolean {
         return this.forEachAncestors(layer => layer.has(listener), includeSelf);
+    }
+
+    //#endregion
+
+    //#region 注册监听监听器变化回调函数
+
+    /**
+     * 当当前层有新的事件监听器被添加时触发
+     */
+    on(event: 'addListener', listener: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 当当前层有事件监听器被删除时触发
+     */
+    on(event: 'removeListener', listener: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 当祖先有新的事件监听器被添加时触发
+     */
+    on(event: 'ancestorsAddListener', listener: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 当祖先有事件监听器被删除时触发
+     */
+    on(event: 'ancestorsRemoveListener', listener: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 当后代有新的事件监听器被添加时触发
+     */
+    on(event: 'descendantsAddListener', listener: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 当后代有事件监听器被删除时触发
+     */
+    on(event: 'descendantsRemoveListener', listener: AddOrRemoveListenerCallback<T>): void
+    on(event: string, listener: AddOrRemoveListenerCallback<T>): void {
+        switch (event) {
+            case 'addListener':
+                this._onAddListenerCallback.add(listener);
+                break;
+            case 'removeListener':
+                this._onRemoveListenerCallback.add(listener);
+                break;
+            case 'ancestorsAddListener':
+                this._onAncestorsAddListenerCallback.add(listener);
+                break;
+            case 'ancestorsRemoveListener':
+                this._onAncestorsRemoveListenerCallback.add(listener);
+                break;
+            case 'descendantsAddListener':
+                this._onDescendantsAddListenerCallback.add(listener);
+                break;
+            case 'descendantsRemoveListener':
+                this._onDescendantsRemoveListenerCallback.add(listener);
+                break;
+        }
+    }
+
+    /**
+     * 清除所有或单个addListener监听器
+     */
+    off(event: 'addListener', listener?: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 清除所有或单个removeListener监听器
+     */
+    off(event: 'removeListener', listener?: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 清除所有或单个ancestorsAddListener监听器
+     */
+    off(event: 'ancestorsAddListener', listener?: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 清除所有或单个ancestorsRemoveListener监听器
+     */
+    off(event: 'ancestorsRemoveListener', listener?: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 清除所有或单个descendantsAddListener监听器
+     */
+    off(event: 'descendantsAddListener', listener?: AddOrRemoveListenerCallback<T>): void
+    /**
+     * 清除所有或单个descendantsRemoveListener监听器
+     */
+    off(event: 'descendantsRemoveListener', listener?: AddOrRemoveListenerCallback<T>): void
+    off(event: string, listener?: AddOrRemoveListenerCallback<T>): void {
+        switch (event) {
+            case 'addListener':
+                if (listener)
+                    this._onAddListenerCallback.delete(listener);
+                else
+                    this._onAddListenerCallback.clear();
+                break;
+            case 'removeListener':
+                if (listener)
+                    this._onRemoveListenerCallback.delete(listener);
+                else
+                    this._onRemoveListenerCallback.clear();
+                break;
+            case 'ancestorsAddListener':
+                if (listener)
+                    this._onAncestorsAddListenerCallback.delete(listener);
+                else
+                    this._onAncestorsAddListenerCallback.clear();
+                break;
+            case 'ancestorsRemoveListener':
+                if (listener)
+                    this._onAncestorsRemoveListenerCallback.delete(listener);
+                else
+                    this._onAncestorsRemoveListenerCallback.clear();
+                break;
+            case 'descendantsAddListener':
+                if (listener)
+                    this._onDescendantsAddListenerCallback.delete(listener);
+                else
+                    this._onDescendantsAddListenerCallback.clear();
+                break;
+            case 'descendantsRemoveListener':
+                if (listener)
+                    this._onDescendantsRemoveListenerCallback.delete(listener);
+                else
+                    this._onDescendantsRemoveListenerCallback.clear();
+                break;
+        }
     }
 
     //#endregion
