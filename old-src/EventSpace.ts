@@ -7,17 +7,6 @@ export type EventName = string | string[];
 
 export class EventSpace<T>{
 
-
-
-    cancelDescendants = (eventName: string | string[] = [], includeSelf: boolean = true) => {
-        const level = this._eventLevel.getChildren(EventSpace.convertEventNameType(eventName), false);
-        if (level !== undefined) {
-            if (includeSelf) level.receivers.clear();
-            level.children.clear();
-        }
-    }
-    offDescendants = this.cancelDescendants;
-
     cancelAncestors = (eventName: string | string[] = [], includeSelf: boolean = true) => {
         let level = this._eventLevel;
 
