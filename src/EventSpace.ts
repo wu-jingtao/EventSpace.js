@@ -20,12 +20,17 @@ export interface AddOrRemoveListenerCallback<T> {
     (listener: Listener<T>, layer: EventSpace<T>): any;
 }
 
+/**
+ * 事件名称
+ */
+export type EventName = string | string[];
+
 export default class EventSpace<T> {
 
     //#region 属性与构造
 
     /**
-     * 每隔多长时间清理一次未被使用的空层
+     * 每隔多长时间清理一次不再被使用的空层
      */
     private static readonly _gc_interval = 60 * 1000;
 
@@ -45,22 +50,22 @@ export default class EventSpace<T> {
     private readonly _onRemoveListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
     /**
-     * 相对于当前层，当祖先有新的事件监听器被添加时触发的回调函数
+     * 当祖先有新的事件监听器被添加时触发的回调函数
      */
     private readonly _onAncestorsAddListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
     /**
-     * 相对于当前层，当祖先有事件监听器被删除时触发的回调函数
+     * 当祖先有事件监听器被删除时触发的回调函数
      */
     private readonly _onAncestorsRemoveListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
     /**
-     * 相对于当前层，当后代有新的事件监听器被添加时触发的回调函数
+     * 当后代有新的事件监听器被添加时触发的回调函数
      */
     private readonly _onDescendantsAddListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
     /**
-     * 相对于当前层，当后代有事件监听器被删除时触发的回调函数
+     * 当后代有事件监听器被删除时触发的回调函数
      */
     private readonly _onDescendantsRemoveListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
@@ -133,7 +138,7 @@ export default class EventSpace<T> {
 
         //-------- 清理不再被使用的层 ---------
         let nextClearTime = (new Date).getTime() + EventSpace._gc_interval;   //下一次清理的最早时间
-        this.on('descendantsRemoveListener', (listener, layer) => {
+        this.watch('descendantsRemoveListener', () => {
             if ((new Date).getTime() > nextClearTime) {
                 this._clearNoLongerUsedLayer();
                 nextClearTime = (new Date).getTime() + EventSpace._gc_interval;
@@ -173,7 +178,7 @@ export default class EventSpace<T> {
      * 注意：空字符串将会被转换成空数组
      * @param eventName 事件名称
      */
-    static convertEventNameType(eventName: string | string[]) {
+    static convertEventNameType(eventName: EventName) {
         if (Array.isArray(eventName))
             return eventName;
         else if (eventName === '')
@@ -186,7 +191,7 @@ export default class EventSpace<T> {
      * 根据事件名称获取特定的后代。(不存在会自动创建)
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      */
-    getDescendant(eventName: string | string[]): EventSpace<T> {
+    getDescendant(eventName: EventName): EventSpace<T> {
         let layer: EventSpace<T> = this;
 
         for (const currentName of EventSpace.convertEventNameType(eventName)) {
@@ -232,8 +237,8 @@ export default class EventSpace<T> {
 
         if (this.parent)
             return this.parent.forEachAncestors(callback, true);
-        else
-            return false;
+
+        return false;
     }
 
     /**
@@ -361,7 +366,7 @@ export default class EventSpace<T> {
     /**
      * 注册事件监听器
      */
-    receive<P extends Listener<T>>(listener: P): P {
+    on<P extends Listener<T>>(listener: P): P {
         if (this._listeners.size < this._listeners.add(listener).size) { //确保有新的监听器被添加
             this._onAddListenerCallback.forEach(cb => cb(listener, this));
             this.forEachDescendants(layer => layer._onAncestorsAddListenerCallback.forEach(cb => cb(listener, this)));
@@ -376,10 +381,10 @@ export default class EventSpace<T> {
      * 注意：由于receiveOnce会对传入的listener进行一次包装，所以返回的listener与传入的listener并不相同
      * @param listener 事件监听器
      */
-    receiveOnce(listener: Listener<T>): Listener<T> {
-        return this.receive(function once(data, layer) {
+    once(listener: Listener<T>): Listener<T> {
+        return this.on(function once(data, layer) {
             listener(data, layer);
-            layer.cancel(once);
+            layer.off(once);
         });
     }
 
@@ -387,14 +392,14 @@ export default class EventSpace<T> {
      * 清除所有事件监听器
      * @param clearDataWhenEmpty 是否同时清理该层的data属性，默认true
      */
-    cancel(listener?: undefined, clearDataWhenEmpty?: boolean): void
+    off(listener?: undefined, clearDataWhenEmpty?: boolean): void
     /**
      * 清除特定的事件监听器
      * @param listener 可以传递一个listener来只清除一个特定的事件监听器
      * @param clearDataWhenEmpty 如果删光了该层的所有监听器，是否清理该层的data属性，默认true
      */
-    cancel(listener: Listener<T>, clearDataWhenEmpty?: boolean): void
-    cancel(listener?: Listener<T>, clearDataWhenEmpty: boolean = true): void {
+    off(listener: Listener<T>, clearDataWhenEmpty?: boolean): void
+    off(listener?: Listener<T>, clearDataWhenEmpty: boolean = true): void {
         if (listener) {
             if (this._listeners.delete(listener)) {
                 this._onRemoveListenerCallback.forEach(cb => cb(listener, this));
@@ -420,8 +425,8 @@ export default class EventSpace<T> {
      * @param clearDataWhenEmpty 如果删光了某层的监听器，是否清理该层的data属性，默认true
      * @param includeSelf 可以传递一个boolean来指示是否要同时清除自身的事件监听器，默认true
      */
-    cancelDescendants(listener?: Listener<T>, clearDataWhenEmpty?: boolean, includeSelf: boolean = true): void {
-        this.forEachDescendants(layer => layer.cancel(listener as any, clearDataWhenEmpty), includeSelf);
+    offDescendants(listener?: Listener<T>, clearDataWhenEmpty?: boolean, includeSelf: boolean = true): void {
+        this.forEachDescendants(layer => layer.off(listener as any, clearDataWhenEmpty), includeSelf);
     }
 
     /**
@@ -430,8 +435,8 @@ export default class EventSpace<T> {
      * @param clearDataWhenEmpty 如果删光了某层的监听器，是否清理该层的data属性，默认true
      * @param includeSelf 可以传递一个boolean来指示是否要同时清除自身的事件监听器，默认true
      */
-    cancelAncestors(listener?: Listener<T>, clearDataWhenEmpty?: boolean, includeSelf: boolean = true): void {
-        this.forEachAncestors(layer => layer.cancel(listener as any, clearDataWhenEmpty), includeSelf);
+    offAncestors(listener?: Listener<T>, clearDataWhenEmpty?: boolean, includeSelf: boolean = true): void {
+        this.forEachAncestors(layer => layer.off(listener as any, clearDataWhenEmpty), includeSelf);
     }
 
     /**
@@ -521,28 +526,28 @@ export default class EventSpace<T> {
     /**
      * 当当前层有新的事件监听器被添加时触发
      */
-    on(event: 'addListener', listener: AddOrRemoveListenerCallback<T>): void
+    watch(event: 'addListener', listener: AddOrRemoveListenerCallback<T>): void
     /**
      * 当当前层有事件监听器被删除时触发
      */
-    on(event: 'removeListener', listener: AddOrRemoveListenerCallback<T>): void
+    watch(event: 'removeListener', listener: AddOrRemoveListenerCallback<T>): void
     /**
      * 当祖先有新的事件监听器被添加时触发
      */
-    on(event: 'ancestorsAddListener', listener: AddOrRemoveListenerCallback<T>): void
+    watch(event: 'ancestorsAddListener', listener: AddOrRemoveListenerCallback<T>): void
     /**
      * 当祖先有事件监听器被删除时触发
      */
-    on(event: 'ancestorsRemoveListener', listener: AddOrRemoveListenerCallback<T>): void
+    watch(event: 'ancestorsRemoveListener', listener: AddOrRemoveListenerCallback<T>): void
     /**
      * 当后代有新的事件监听器被添加时触发
      */
-    on(event: 'descendantsAddListener', listener: AddOrRemoveListenerCallback<T>): void
+    watch(event: 'descendantsAddListener', listener: AddOrRemoveListenerCallback<T>): void
     /**
      * 当后代有事件监听器被删除时触发
      */
-    on(event: 'descendantsRemoveListener', listener: AddOrRemoveListenerCallback<T>): void
-    on(event: string, listener: AddOrRemoveListenerCallback<T>): void {
+    watch(event: 'descendantsRemoveListener', listener: AddOrRemoveListenerCallback<T>): void
+    watch(event: string, listener: AddOrRemoveListenerCallback<T>): void {
         switch (event) {
             case 'addListener':
                 this._onAddListenerCallback.add(listener);
@@ -568,28 +573,28 @@ export default class EventSpace<T> {
     /**
      * 清除所有或单个addListener监听器
      */
-    off(event: 'addListener', listener?: AddOrRemoveListenerCallback<T>): void
+    watchOff(event: 'addListener', listener?: AddOrRemoveListenerCallback<T>): void
     /**
      * 清除所有或单个removeListener监听器
      */
-    off(event: 'removeListener', listener?: AddOrRemoveListenerCallback<T>): void
+    watchOff(event: 'removeListener', listener?: AddOrRemoveListenerCallback<T>): void
     /**
      * 清除所有或单个ancestorsAddListener监听器
      */
-    off(event: 'ancestorsAddListener', listener?: AddOrRemoveListenerCallback<T>): void
+    watchOff(event: 'ancestorsAddListener', listener?: AddOrRemoveListenerCallback<T>): void
     /**
      * 清除所有或单个ancestorsRemoveListener监听器
      */
-    off(event: 'ancestorsRemoveListener', listener?: AddOrRemoveListenerCallback<T>): void
+    watchOff(event: 'ancestorsRemoveListener', listener?: AddOrRemoveListenerCallback<T>): void
     /**
      * 清除所有或单个descendantsAddListener监听器
      */
-    off(event: 'descendantsAddListener', listener?: AddOrRemoveListenerCallback<T>): void
+    watchOff(event: 'descendantsAddListener', listener?: AddOrRemoveListenerCallback<T>): void
     /**
      * 清除所有或单个descendantsRemoveListener监听器
      */
-    off(event: 'descendantsRemoveListener', listener?: AddOrRemoveListenerCallback<T>): void
-    off(event: string, listener?: AddOrRemoveListenerCallback<T>): void {
+    watchOff(event: 'descendantsRemoveListener', listener?: AddOrRemoveListenerCallback<T>): void
+    watchOff(event: string, listener?: AddOrRemoveListenerCallback<T>): void {
         switch (event) {
             case 'addListener':
                 if (listener)
