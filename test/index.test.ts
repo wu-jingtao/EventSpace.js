@@ -84,6 +84,9 @@ it('测试属性', function () {
     expect(es.get('d.e.f').data).to.be(undefined);
 
     //测试注册监听监听器变化回调函数
+
+    const root_descendantsRemoveListener = (<any>es)._onDescendantsRemoveListenerCallback.values().next().value;
+
     es.watch('addListener', () => { });
     es.watch('removeListener', () => { });
     es.watch('ancestorsAddListener', () => { });
@@ -98,8 +101,6 @@ it('测试属性', function () {
     expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(1);
     expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(2);   //构造函数那里还会注册一个
 
-    const root_descendantsRemoveListener = (<any>es)._onDescendantsRemoveListenerCallback.values().next().value;
-
     es.watchOff('addListener');
     es.watchOff('removeListener');
     es.watchOff('ancestorsAddListener');
@@ -112,7 +113,7 @@ it('测试属性', function () {
     expect((<any>es)._onAncestorsAddListenerCallback.size).to.be(0);
     expect((<any>es)._onAncestorsRemoveListenerCallback.size).to.be(0);
     expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(0);
-    expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(1);   //确保不允许清除构造函数配置的
+    expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(1);   //确保没有清除构造函数配置的
 
     expect(root_descendantsRemoveListener).to.be((<any>es)._onDescendantsRemoveListenerCallback.values().next().value);
 });
