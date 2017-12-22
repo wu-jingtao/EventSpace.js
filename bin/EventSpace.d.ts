@@ -28,10 +28,6 @@ export default class EventSpace<T> {
      */
     private static readonly _gc_interval;
     /**
-     * 当前层注册的事件监听器
-     */
-    private readonly _listeners;
-    /**
      * 当当前层有新的事件监听器被添加时触发的回调函数
      */
     private readonly _onAddListenerCallback;
@@ -56,13 +52,17 @@ export default class EventSpace<T> {
      */
     private readonly _onDescendantsRemoveListenerCallback;
     /**
-     * 父层。根的父层为undefined
+     * 当前层注册的事件监听器
      */
-    readonly parent?: EventSpace<T>;
+    private readonly _listeners;
     /**
     * 子层, key:子层名称
     */
     readonly children: Map<string, EventSpace<T>>;
+    /**
+     * 父层。根的父层为undefined
+     */
+    readonly parent?: EventSpace<T>;
     /**
      * 当前层的名称。根的名称为空字符串
      * 注意：以数组表示时，空数组才代表根
@@ -103,7 +103,7 @@ export default class EventSpace<T> {
      * 根据事件名称获取特定的后代。(不存在会自动创建)
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      */
-    getDescendant(eventName: EventName): EventSpace<T>;
+    get(eventName: EventName): EventSpace<T>;
     /**
      * 循环遍历每一个后代。返回boolean，用于判断遍历是否发生中断
      * 提示：如果把callback作为判断条件，可以将forEachDescendants模拟成includes来使用

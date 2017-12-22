@@ -1,263 +1,457 @@
 import expect = require('expect.js');
-import {
-    receive,
-    receiveOnce,
-    cancel,
-    cancelDescendants,
-    cancelAncestors,
-    trigger,
-    triggerDescendants,
-    triggerAncestors,
-    has,
-    hasDescendants,
-    hasAncestors
-} from '../src';
+import EventSpace from '../src/EventSpace';
+
+const es = new EventSpace();
 
 beforeEach('清除所有注册过的监听器', function () {
-    cancelDescendants();
+    es.off();
+    es.children.clear();
 });
 
-it('测试 receive 和 trigger', function () {
-    const result: number[] = [];
+it('测试属性', function () {
+    es.on(function () { });
+    es.get('').on(function () { });
+    es.get([]).on(function () { });
+    es.get(['d']).on(function () { });
+    es.get(['d', 'e']).on(function () { });
+    es.get(['d', 'e', 'f']).on(function () { });
 
-    receive([], (data) => result.push(data));
-    receive('a', (data) => result.push(data));
-    receive('a.b', (data) => result.push(data));
-    receive('a.b.c', (data) => result.push(data));
+    //测试 parent 属性
+    expect(es.parent).to.be(undefined);
+    expect(es.get('').parent).to.be(undefined);
+    expect(es.get([]).parent).to.be(undefined);
+    expect(es.get('d').parent).to.be(es);
+    expect(es.get('d.e').parent).to.be(es.get('d'));
+    expect(es.get('d.e.f').parent).to.be(es.get('d.e'));
 
-    receive([], (data) => result.push(data));
-    receive(['a'], (data) => result.push(data));
-    receive(['a', 'b'], (data) => result.push(data));
-    receive(['a', 'b', 'c'], (data) => result.push(data));
+    //测试 children 属性
+    expect(es.children.size).to.be(1);
+    expect(es.children.has('d')).to.be.ok();
+    expect(es.get('').children.size).to.be(1);
+    expect(es.get('').children.has('d')).to.be.ok();
+    expect(es.get([]).children.size).to.be(1);
+    expect(es.get([]).children.has('d')).to.be.ok();
+    expect(es.get('d').children.size).to.be(1);
+    expect(es.get('d').children.has('e')).to.be.ok();
+    expect(es.get('d.e').children.size).to.be(1);
+    expect(es.get('d.e').children.has('f')).to.be.ok();
+    expect(es.get('d.e.f').children.size).to.be(0);
 
-    trigger([], 1);
-    trigger('a', 2);
-    trigger('a.b', 3);
-    trigger('a.b.c', 4);
-    trigger('a.b.c.d', 5);
+    //测试 name 属性
+    expect(es.name).to.be('');
+    expect(es.get('').name).to.be('');
+    expect(es.get([]).name).to.be('');
+    expect(es.get('d').name).to.be('d');
+    expect(es.get('d.e').name).to.be('e');
+    expect(es.get('d.e.f').name).to.be('f');
 
-    trigger([], 1);
-    trigger(['a'], 2);
-    trigger(['a', 'b'], 3);
-    trigger(['a', 'b', 'c'], 4);
-    trigger(['a', 'b', 'c', 'd'], 5);
+    //测试 fullName 属性
+    expect(es.fullName).to.be.eql([]);
+    expect(es.get('').fullName).to.be.eql([]);
+    expect(es.get([]).fullName).to.be.eql([]);
+    expect(es.get('d').fullName).to.be.eql(['d']);
+    expect(es.get('d.e').fullName).to.be.eql(['d', 'e']);
+    expect(es.get('d.e.f').fullName).to.be.eql(['d', 'e', 'f']);
 
-    expect(result).to.eql([
-        1, 1, 2, 2, 3, 3, 4, 4,
-        1, 1, 2, 2, 3, 3, 4, 4
+    //测试 listenerCount 属性
+    expect(es.listenerCount).to.be(3);
+    expect(es.get('d').listenerCount).to.be(1);
+    expect(es.get('d.e').listenerCount).to.be(1);
+    expect(es.get('d.e.f').listenerCount).to.be(1);
+
+    //测试 ancestorsListenerCount 属性
+    expect(es.ancestorsListenerCount).to.be(0);
+    expect(es.get('d').ancestorsListenerCount).to.be(3);
+    expect(es.get('d.e').ancestorsListenerCount).to.be(4);
+    expect(es.get('d.e.f').ancestorsListenerCount).to.be(5);
+
+    //测试 descendantsListenerCount 属性
+    expect(es.descendantsListenerCount).to.be(3);
+    expect(es.get('d').descendantsListenerCount).to.be(2);
+    expect(es.get('d.e').descendantsListenerCount).to.be(1);
+    expect(es.get('d.e.f').descendantsListenerCount).to.be(0);
+
+    //测试清空监听器后删除 data 属性
+    es.data = 1;
+    es.get('d').data = 1;
+    es.get('d.e').data = 1;
+    es.get('d.e.f').data = 1;
+    es.offDescendants();
+
+    expect(es.data).to.be(undefined);
+    expect(es.get('d').data).to.be(undefined);
+    expect(es.get('d.e').data).to.be(undefined);
+    expect(es.get('d.e.f').data).to.be(undefined);
+
+    //测试注册监听监听器变化回调函数
+    es.watch('addListener', () => { });
+    es.watch('removeListener', () => { });
+    es.watch('ancestorsAddListener', () => { });
+    es.watch('ancestorsRemoveListener', () => { });
+    es.watch('descendantsAddListener', () => { });
+    es.watch('descendantsRemoveListener', () => { });
+
+    expect((<any>es)._onAddListenerCallback.size).to.be(1);
+    expect((<any>es)._onRemoveListenerCallback.size).to.be(1);
+    expect((<any>es)._onAncestorsAddListenerCallback.size).to.be(1);
+    expect((<any>es)._onAncestorsRemoveListenerCallback.size).to.be(1);
+    expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(1);
+    expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(2);   //构造函数那里还会注册一个
+
+    const root_descendantsRemoveListener = (<any>es)._onDescendantsRemoveListenerCallback.values().next().value;
+
+    es.watchOff('addListener');
+    es.watchOff('removeListener');
+    es.watchOff('ancestorsAddListener');
+    es.watchOff('ancestorsRemoveListener');
+    es.watchOff('descendantsAddListener');
+    es.watchOff('descendantsRemoveListener');
+
+    expect((<any>es)._onAddListenerCallback.size).to.be(0);
+    expect((<any>es)._onRemoveListenerCallback.size).to.be(0);
+    expect((<any>es)._onAncestorsAddListenerCallback.size).to.be(0);
+    expect((<any>es)._onAncestorsRemoveListenerCallback.size).to.be(0);
+    expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(0);
+    expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(1);   //确保不允许清除构造函数配置的
+
+    expect(root_descendantsRemoveListener).to.be((<any>es)._onDescendantsRemoveListenerCallback.values().next().value);
+});
+
+describe('测试工具方法', function () {
+
+    it('测试 _clearNoLongerUsedLayer', function () {
+        es.get('a.b.c.d.e');
+        expect(es.children.size).to.be(1);
+        expect(es.children.has('a')).to.be.ok();
+
+        (<any>es)._clearNoLongerUsedLayer();
+        expect(es.children.size).to.be(0);
+    });
+
+    it('测试 forEachDescendants 与 forEachAncestors', function () {
+        const result: any[] = [];
+
+        es.get('a.b.c.d.e');
+
+        es.forEachDescendants(layer => { result.push(layer.name) });
+        es.forEachDescendants(layer => { result.push(layer.name) }, true);
+        es.forEachDescendants(layer => { result.push(layer.name); return layer.name === 'c' });
+
+        es.get('a.b.c.d.e').forEachAncestors(layer => { result.push(layer.name) });
+        es.get('a.b.c.d.e').forEachAncestors(layer => { result.push(layer.name) }, true);
+        es.get('a.b.c.d.e').forEachAncestors(layer => { result.push(layer.name); return layer.name === 'c' });
+
+        expect(result).to.be.eql([
+            'a', 'b', 'c', 'd', 'e',
+            '', 'a', 'b', 'c', 'd', 'e',
+            'a', 'b', 'c',
+
+            'd', 'c', 'b', 'a', '',
+            'e', 'd', 'c', 'b', 'a', '',
+            'd', 'c'
+        ]);
+    });
+
+    it('测试 mapDescendants 与 mapAncestors', function () {
+        es.get('a.b.c');
+
+        expect(es.mapDescendants()).to.be.eql([
+            es.get('a'),
+            es.get('a.b'),
+            es.get('a.b.c')
+        ]);
+
+        expect(es.mapDescendants(undefined, true)).to.be.eql([
+            es,
+            es.get('a'),
+            es.get('a.b'),
+            es.get('a.b.c')
+        ]);
+
+        expect(es.mapDescendants(layer => layer.name)).to.be.eql([
+            'a', 'b', 'c'
+        ]);
+
+        expect(es.get('a.b.c').mapAncestors()).to.be.eql([
+            es.get('a.b'),
+            es.get('a'),
+            es
+        ]);
+
+        expect(es.get('a.b.c').mapAncestors(undefined, true)).to.be.eql([
+            es.get('a.b.c'),
+            es.get('a.b'),
+            es.get('a'),
+            es
+        ]);
+
+        expect(es.get('a.b.c').mapAncestors(layer => layer.name)).to.be.eql([
+            'b', 'a', ''
+        ]);
+    });
+
+    it('测试 reduceDescendants 与 reduceAncestors', function () {
+        es.get('a.b.c');
+
+        expect(es.reduceDescendants((pre, layer) => pre + '.' + layer.name, '')).to.be('.a.b.c');
+        expect(es.reduceDescendants((pre, layer) => pre + '.' + layer.name, '', true)).to.be('..a.b.c');
+
+        expect(es.get('a.b.c').reduceAncestors((pre, layer) => pre + '.' + layer.name, '')).to.be('.b.a.');
+        expect(es.get('a.b.c').reduceAncestors((pre, layer) => pre + '.' + layer.name, '', true)).to.be('.c.b.a.');
+    });
+
+    it('测试 findDescendant 与 findAncestor', function () {
+        es.get('a.b.c');
+
+        expect(es.findDescendant(layer => layer.name === 'b')).to.be(es.get('a.b'));
+        expect(es.findDescendant(layer => layer.name === '')).to.be(undefined);
+        expect(es.findDescendant(layer => layer.name === '', true)).to.be(es);
+
+        expect(es.get('a.b.c').findAncestor(layer => layer.name === 'b')).to.be(es.get('a.b'));
+        expect(es.get('a.b.c').findAncestor(layer => layer.name === 'c')).to.be(undefined);
+        expect(es.get('a.b.c').findAncestor(layer => layer.name === 'c', true)).to.be(es.get('a.b.c'));
+    });
+});
+
+describe('测试事件监听器', function () {
+
+    it('测试 on 和 trigger', function () {
+        const result: number[] = [];
+
+        es.get([]).on((data) => result.push(data));
+        es.get('a').on((data) => result.push(data));
+        es.get('a.b').on((data) => result.push(data));
+        es.get('a.b.c').on((data) => result.push(data));
+
+        es.get([]).trigger(1);
+        es.get('a').trigger(2);
+        es.get('a.b').trigger(3);
+        es.get('a.b.c').trigger(4);
+        es.get('a.b.c.d').trigger(5);
+
+        expect(result).to.eql([
+            1, 2, 3, 4
+        ]);
+    });
+
+    it('测试 once 和 trigger', function () {
+        const result: number[] = [];
+
+        es.get([]).once((data) => result.push(data));
+        es.get('a').once((data) => result.push(data));
+        es.get('a.b').once((data) => result.push(data));
+        es.get('a.b.c').once((data) => result.push(data));
+
+        es.get([]).trigger(1);
+        es.get('a').trigger(2);
+        es.get('a.b').trigger(3);
+        es.get('a.b.c').trigger(4);
+        es.get('a.b.c.d').trigger(5);
+
+        es.get([]).trigger(1);
+        es.get('a').trigger(2);
+        es.get('a.b').trigger(3);
+        es.get('a.b.c').trigger(4);
+        es.get('a.b.c.d').trigger(5);
+
+        expect(result).to.eql([
+            1, 2, 3, 4
+        ]);
+    });
+
+    it('测试 triggerDescendants', function () {
+        const result: any[] = [];
+
+        es.get([]).on((data, layer) => result.push(data, layer.name));
+        es.get('a').on((data, layer) => result.push(data, layer.name));
+        es.get('a.b').on((data, layer) => result.push(data, layer.name));
+        es.get('a.b.c').on((data, layer) => result.push(data, layer.name));
+
+        es.get([]).triggerDescendants(1);
+        es.get('a').triggerDescendants(2);
+        es.get('a.b').triggerDescendants(3);
+        es.get('a.b.c').triggerDescendants(4);
+        es.get('a.b.c.d').triggerDescendants(5);
+
+        es.get([]).triggerDescendants(1, false);
+        es.get('a').triggerDescendants(2, false);
+        es.get('a.b').triggerDescendants(3, false);
+        es.get('a.b.c').triggerDescendants(4, false);
+        es.get('a.b.c.d').triggerDescendants(5, false);
+
+        expect(result).to.eql([
+            1, '', 1, 'a', 1, 'b', 1, 'c', 2, 'a', 2, 'b', 2, 'c', 3, 'b', 3, 'c', 4, 'c',
+            1, 'a', 1, 'b', 1, 'c', 2, 'b', 2, 'c', 3, 'c'
+        ]);
+    });
+
+    it('测试 triggerAncestors', function () {
+        const result: any[] = [];
+
+        es.get([]).on((data, layer) => result.push(data, layer.name));
+        es.get('a').on((data, layer) => result.push(data, layer.name));
+        es.get('a.b').on((data, layer) => result.push(data, layer.name));
+        es.get('a.b.c').on((data, layer) => result.push(data, layer.name));
+
+        es.get([]).triggerAncestors(1);
+        es.get('a').triggerAncestors(2);
+        es.get('a.b').triggerAncestors(3);
+        es.get('a.b.c').triggerAncestors(4);
+        es.get('a.b.c.d').triggerAncestors(5);
+
+        es.get([]).triggerAncestors(1, false);
+        es.get('a').triggerAncestors(2, false);
+        es.get('a.b').triggerAncestors(3, false);
+        es.get('a.b.c').triggerAncestors(4, false);
+        es.get('a.b.c.d').triggerAncestors(5, false);
+
+        expect(result).to.eql([
+            1, '', 2, 'a', 2, '', 3, 'b', 3, 'a', 3, '', 4, 'c', 4, 'b', 4, 'a', 4, '', 5, 'c', 5, 'b', 5, 'a', 5, '',
+            2, '', 3, 'a', 3, '', 4, 'b', 4, 'a', 4, '', 5, 'c', 5, 'b', 5, 'a', 5, ''
+        ]);
+    });
+
+    it('测试 off', function () {
+        const result: number[] = [];
+        const func = (data: any) => result.push(data);
+
+        es.on((data) => result.push(data));
+        es.get('a').on((data) => result.push(data));
+        es.on(func);
+
+        es.off(func);
+        es.get('a').off();
+
+        es.trigger(1);
+        es.get('a').trigger(2);
+
+        expect(result).to.eql([1]);
+    });
+
+    it('测试 offDescendants', function () {
+        const result: any[] = [];
+        const func = (data: any, layer: any) => result.push(data, layer.name);
+
+        es.get([]).on((data, layer) => result.push(data, layer.name));
+        es.get('a').on(func);
+        es.get('a.b').on(func);
+        es.get('a.b.c').on((data, layer) => result.push(data, layer.name));
+
+        es.offDescendants(func);
+        es.get([]).triggerDescendants(1);
+
+        es.offDescendants();
+        es.get([]).triggerDescendants(2);
+
+        expect(result).to.eql([
+            1, '', 1, 'c'
+        ]);
+    });
+
+    it('测试 offAncestors', function () {
+        const result: any[] = [];
+        const func = (data: any, layer: any) => result.push(data, layer.name);
+
+        es.get([]).on((data, layer) => result.push(data, layer.name));
+        es.get('a').on(func);
+        es.get('a.b').on(func);
+        es.get('a.b.c').on((data, layer) => result.push(data, layer.name));
+
+        es.get('a.b.c').offAncestors(func);
+        es.get([]).triggerDescendants(1);
+
+        es.get('a.b.c').offAncestors();
+        es.get([]).triggerDescendants(2);
+
+        expect(result).to.eql([
+            1, '', 1, 'c'
+        ]);
+    });
+
+    it('测试 has', function () {
+        const func = () => { };
+
+        es.get('a').on(() => { });
+        es.get('a').on(func);
+
+        expect(es.get('').has()).to.not.be.ok();
+        expect(es.get('').has(func)).to.not.be.ok();
+        expect(es.get('').has(() => { })).to.not.be.ok();
+
+        expect(es.get('a').has()).to.be.ok();
+        expect(es.get('a').has(func)).to.be.ok();
+        expect(es.get('a').has(() => { })).to.not.be.ok();
+
+        expect(es.get('a.b').has()).to.not.be.ok();
+        expect(es.get('a.b').has(func)).to.not.be.ok();
+        expect(es.get('a.b').has(() => { })).to.not.be.ok();
+    });
+
+    it('测试 hasDescendants', function () {
+        const func = () => { };
+
+        es.get('a').on(() => { });
+        es.get('a').on(func);
+
+        expect(es.get('').hasDescendants()).to.be.ok();
+        expect(es.get('').hasDescendants(func)).to.be.ok();
+        expect(es.get('').hasDescendants(() => { })).to.not.be.ok();
+
+        expect(es.get('a').hasDescendants()).to.be.ok();
+        expect(es.get('a').hasDescendants(func)).to.be.ok();
+        expect(es.get('a').hasDescendants(() => { })).to.not.be.ok();
+
+        expect(es.get('a.b').hasDescendants()).to.not.be.ok();
+        expect(es.get('a.b').hasDescendants(func)).to.not.be.ok();
+        expect(es.get('a.b').hasDescendants(() => { })).to.not.be.ok();
+    });
+
+    it('测试 hasAncestors', function () {
+        const func = () => { };
+
+        es.get('a').on(() => { });
+        es.get('a').on(func);
+
+        expect(es.get('').hasAncestors()).to.not.be.ok();
+        expect(es.get('').hasAncestors(func)).to.not.be.ok();
+        expect(es.get('').hasAncestors(() => { })).to.not.be.ok();
+
+        expect(es.get('a').hasAncestors()).to.be.ok();
+        expect(es.get('a').hasAncestors(func)).to.be.ok();
+        expect(es.get('a').hasAncestors(() => { })).to.not.be.ok();
+
+        expect(es.get('a.b').hasAncestors()).to.be.ok();
+        expect(es.get('a.b').hasAncestors(func)).to.be.ok();
+        expect(es.get('a.b').hasAncestors(() => { })).to.not.be.ok();
+    });
+});
+
+it('测试监听事件监听器', function () {
+    const result: any[] = [];
+
+    es.get('b').watch('addListener', (listener, layer) => result.push(layer.name, 'addListener'));
+    es.get('b').watch('removeListener', (listener, layer) => result.push(layer.name, 'removeListener'));
+    es.get('b').watch('ancestorsAddListener', (listener, layer) => result.push(layer.name, 'ancestorsAddListener'));
+    es.get('b').watch('ancestorsRemoveListener', (listener, layer) => result.push(layer.name, 'ancestorsRemoveListener'));
+    es.get('b').watch('descendantsAddListener', (listener, layer) => result.push(layer.name, 'descendantsAddListener'));
+    es.get('b').watch('descendantsRemoveListener', (listener, layer) => result.push(layer.name, 'descendantsRemoveListener'));
+
+    es.get('').on(function () { });
+    es.get('b').on(function () { });
+    es.get('b.c').on(function () { });
+    es.get('d').on(function () { });
+
+    es.get('').off();
+    es.get('b').off();
+    es.get('b.c').off();
+    es.get('d').off();
+
+    expect(result).to.be.eql([
+        '', 'ancestorsAddListener',
+        'b', 'addListener',
+        'c', 'descendantsAddListener',
+        '', 'ancestorsRemoveListener',
+        'b', 'removeListener',
+        'c', 'descendantsRemoveListener'
     ]);
-});
-
-it('测试 receiveOnce 和 trigger', function () {
-    const result: number[] = [];
-
-    receiveOnce([], (data) => result.push(data));
-    receiveOnce('a', (data) => result.push(data));
-    receiveOnce('a.b', (data) => result.push(data));
-    receiveOnce('a.b.c', (data) => result.push(data));
-
-    receiveOnce([], (data) => result.push(data));
-    receiveOnce(['a'], (data) => result.push(data));
-    receiveOnce(['a', 'b'], (data) => result.push(data));
-    receiveOnce(['a', 'b', 'c'], (data) => result.push(data));
-
-    trigger([], 1);
-    trigger('a', 2);
-    trigger('a.b', 3);
-    trigger('a.b.c', 4);
-    trigger('a.b.c.d', 5);
-
-    trigger([], 1);
-    trigger(['a'], 2);
-    trigger(['a', 'b'], 3);
-    trigger(['a', 'b', 'c'], 4);
-    trigger(['a', 'b', 'c', 'd'], 5);
-
-    expect(result).to.eql([1, 1, 2, 2, 3, 3, 4, 4]);
-});
-
-it('测试 triggerDescendants', function () {
-    const result: number[] = [];
-
-    receive([], (data) => result.push(data));
-    receive('a', (data) => result.push(data));
-    receive('a.b', (data) => result.push(data));
-    receive('a.b.c', (data) => result.push(data));
-
-    triggerDescendants([], 1);
-    triggerDescendants('a', 2);
-    triggerDescendants('a.b', 3);
-    triggerDescendants('a.b.c', 4);
-    triggerDescendants('a.b.c.d', 5);
-
-    triggerDescendants([], 1, false);
-    triggerDescendants(['a'], 2, false);
-    triggerDescendants(['a', 'b'], 3, false);
-    triggerDescendants(['a', 'b', 'c'], 4, false);
-    triggerDescendants(['a', 'b', 'c', 'd'], 5, false);
-
-    expect(result).to.eql([
-        1, 1, 1, 1, 2, 2, 2, 3, 3, 4,
-        1, 1, 1, 2, 2, 3
-    ]);
-});
-
-it('测试 triggerAncestors', function () {
-    const result: number[] = [];
-
-    receive([], (data) => result.push(data));
-    receive('a', (data) => result.push(data));
-    receive('a.b', (data) => result.push(data));
-    receive('a.b.c', (data) => result.push(data));
-
-    triggerAncestors([], 1);
-    triggerAncestors('a', 2);
-    triggerAncestors('a.b', 3);
-    triggerAncestors('a.b.c', 4);
-    triggerAncestors('a.b.c.d', 5);
-
-    triggerAncestors([], 1, false);
-    triggerAncestors(['a'], 2, false);
-    triggerAncestors(['a', 'b'], 3, false);
-    triggerAncestors(['a', 'b', 'c'], 4, false);
-    triggerAncestors(['a', 'b', 'c', 'd'], 5, false);
-
-    expect(result).to.eql([
-        1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
-        2, 3, 3, 4, 4, 4, 5, 5, 5, 5
-    ]);
-});
-
-it('测试 cancel', function () {
-    const result: number[] = [];
-    const func = (data: any) => result.push(data);
-
-    receive([], (data) => result.push(data));
-    receive('a', (data) => result.push(data));
-    receive('a', func);
-    receive('a.b', (data) => result.push(data));
-    receiveOnce('a.b', (data) => result.push(data));
-    receive('a.b.c', (data) => result.push(data));
-
-    cancel('a', func);
-    cancel('a.b');
-
-    trigger([], 1);
-    trigger(['a'], 2);
-    trigger(['a', 'b'], 3);
-    trigger(['a', 'b', 'c'], 4);
-    trigger(['a', 'b', 'c', 'd'], 5);
-
-    expect(result).to.eql([1, 2, 4]);
-});
-
-it('测试 cancelDescendants', function () {
-    const result: number[] = [];
-
-    receive([], (data) => result.push(data));
-    receive('a', (data) => result.push(data));
-    receiveOnce('a.b', (data) => result.push(data));
-    receive('a.b.c', (data) => result.push(data));
-
-    cancelDescendants('a.b');
-
-    trigger([], 1);
-    trigger(['a'], 2);
-    trigger(['a', 'b'], 3);
-    trigger(['a', 'b', 'c'], 4);
-    trigger(['a', 'b', 'c', 'd'], 5);
-
-    cancelDescendants([], false);
-
-    trigger([], 1);
-    trigger(['a'], 2);
-    trigger(['a', 'b'], 3);
-    trigger(['a', 'b', 'c'], 4);
-    trigger(['a', 'b', 'c', 'd'], 5);
-
-    expect(result).to.eql([
-        1, 2,
-        1
-    ]);
-});
-
-it('测试 cancelAncestors', function () {
-    const result: number[] = [];
-
-    receive([], (data) => result.push(data));
-    receive('a', (data) => result.push(data));
-    receiveOnce('a.b', (data) => result.push(data));
-    receive('a.b.c', (data) => result.push(data));
-
-    cancelAncestors([]);
-
-    trigger([], 1);
-    trigger(['a'], 2);
-    trigger(['a', 'b'], 3);
-    trigger(['a', 'b', 'c'], 4);
-    trigger(['a', 'b', 'c', 'd'], 5);
-
-    cancelAncestors('a.b.c', false);
-
-    trigger([], 1);
-    trigger(['a'], 2);
-    trigger(['a', 'b'], 3);
-    trigger(['a', 'b', 'c'], 4);
-    trigger(['a', 'b', 'c', 'd'], 5);
-
-    expect(result).to.eql([
-        2, 3, 4,
-        4
-    ]);
-});
-
-it('测试 has', function () {
-    const func = () => { };
-    receive('a.b', func);
-    receive('a.b.c', () => { });
-
-    expect(has('a')).to.not.be.ok();
-    expect(has('a.b')).to.be.ok();
-    expect(has('a.b', func)).to.be.ok();
-    expect(has('a.b.c')).to.be.ok();
-    expect(has('a.b.c', func)).to.not.be.ok();
-    expect(has('a.b.c.d')).to.not.be.ok();
-});
-
-it('测试 hasDescendants', function () {
-    receive([], () => { });
-    receive('a', () => { });
-    receive('a.b', () => { });
-    receive('a.b.c', () => { });
-
-    expect(hasDescendants([])).to.be.ok();
-    expect(hasDescendants('a')).to.be.ok();
-    expect(hasDescendants('a.b')).to.be.ok();
-    expect(hasDescendants('a.b.c')).to.be.ok();
-    expect(hasDescendants('a.b.c.d')).to.not.be.ok();
-
-    expect(hasDescendants([], false)).to.be.ok();
-    expect(hasDescendants('a', false)).to.be.ok();
-    expect(hasDescendants('a.b', false)).to.be.ok();
-    expect(hasDescendants('a.b.c', false)).to.not.be.ok();
-    expect(hasDescendants('a.b.c.d', false)).to.not.be.ok();
-});
-
-it('测试 hasAncestors', function () {
-    receive([], () => { });
-    receive('a', () => { });
-    receive('a.b', () => { });
-    receive('a.b.c', () => { });
-
-    expect(hasAncestors([])).to.be.ok();
-    expect(hasAncestors('a')).to.be.ok();
-    expect(hasAncestors('a.b')).to.be.ok();
-    expect(hasAncestors('a.b.c')).to.be.ok();
-    expect(hasAncestors('a.b.c.d')).to.be.ok();
-
-    expect(hasAncestors([], false)).to.not.be.ok();
-    expect(hasAncestors('a', false)).to.be.ok();
-    expect(hasAncestors('a.b', false)).to.be.ok();
-    expect(hasAncestors('a.b.c', false)).to.be.ok();
-    expect(hasAncestors('a.b.c.d', false)).to.be.ok();
 });

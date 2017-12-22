@@ -35,11 +35,6 @@ export default class EventSpace<T> {
     private static readonly _gc_interval = 60 * 1000;
 
     /**
-     * 当前层注册的事件监听器     
-     */
-    private readonly _listeners: Set<Listener<T>> = new Set();
-
-    /**
      * 当当前层有新的事件监听器被添加时触发的回调函数
      */
     private readonly _onAddListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
@@ -70,14 +65,19 @@ export default class EventSpace<T> {
     private readonly _onDescendantsRemoveListenerCallback: Set<AddOrRemoveListenerCallback<T>> = new Set();
 
     /**
-     * 父层。根的父层为undefined   
+     * 当前层注册的事件监听器     
      */
-    readonly parent?: EventSpace<T>;
-
+    private readonly _listeners: Set<Listener<T>> = new Set();
+    
     /**
     * 子层, key:子层名称
     */
     readonly children: Map<string, EventSpace<T>> = new Map();
+
+    /**
+     * 父层。根的父层为undefined   
+     */
+    readonly parent?: EventSpace<T>;
 
     /**
      * 当前层的名称。根的名称为空字符串    
@@ -137,13 +137,15 @@ export default class EventSpace<T> {
         this.name = name;
 
         //-------- 清理不再被使用的层 ---------
-        let nextClearTime = (new Date).getTime() + EventSpace._gc_interval;   //下一次清理的最早时间
-        this.watch('descendantsRemoveListener', () => {
-            if ((new Date).getTime() > nextClearTime) {
-                this._clearNoLongerUsedLayer();
-                nextClearTime = (new Date).getTime() + EventSpace._gc_interval;
-            }
-        });
+        if (this.parent === undefined && this.name === '') {    //确保是根
+            let nextClearTime = (new Date).getTime() + EventSpace._gc_interval;   //下一次清理的最早时间
+            this.watch('descendantsRemoveListener', () => {
+                if ((new Date).getTime() > nextClearTime) {
+                    this._clearNoLongerUsedLayer();
+                    nextClearTime = (new Date).getTime() + EventSpace._gc_interval;
+                }
+            });
+        }
     }
 
     //#endregion
@@ -191,7 +193,7 @@ export default class EventSpace<T> {
      * 根据事件名称获取特定的后代。(不存在会自动创建)
      * @param eventName 事件名称。可以为字符串或数组(字符串通过‘.’来分割层级)
      */
-    getDescendant(eventName: EventName): EventSpace<T> {
+    get(eventName: EventName): EventSpace<T> {
         let layer: EventSpace<T> = this;
 
         for (const currentName of EventSpace.convertEventNameType(eventName)) {
@@ -521,7 +523,7 @@ export default class EventSpace<T> {
 
     //#endregion
 
-    //#region 注册监听监听器变化回调函数
+    //#region 注册监听监听器变化的回调函数
 
     /**
      * 当当前层有新的事件监听器被添加时触发
@@ -629,8 +631,14 @@ export default class EventSpace<T> {
             case 'descendantsRemoveListener':
                 if (listener)
                     this._onDescendantsRemoveListenerCallback.delete(listener);
-                else
+                else if (this.parent)
                     this._onDescendantsRemoveListenerCallback.clear();
+                else {
+                    //这样做是为了避免删除root的_clearNoLongerUsedLayer
+                    const root = this._onDescendantsRemoveListenerCallback.values().next().value;
+                    this._onDescendantsRemoveListenerCallback.clear();
+                    this._onDescendantsRemoveListenerCallback.add(root);
+                }
                 break;
         }
     }
