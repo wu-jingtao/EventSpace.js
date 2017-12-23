@@ -68,7 +68,7 @@ export default class EventSpace<T> {
      * 当前层注册的事件监听器     
      */
     private readonly _listeners: Set<Listener<T>> = new Set();
-    
+
     /**
     * 子层, key:子层名称
     */
@@ -162,13 +162,13 @@ export default class EventSpace<T> {
             const needClear =
                 this.children.size === 0 &&
                 this._listeners.size === 0 &&
+                this.data === undefined &&
                 this._onAddListenerCallback.size === 0 &&
                 this._onRemoveListenerCallback.size === 0 &&
                 this._onAncestorsAddListenerCallback.size === 0 &&
                 this._onAncestorsRemoveListenerCallback.size === 0 &&
                 this._onDescendantsAddListenerCallback.size === 0 &&
-                this._onDescendantsRemoveListenerCallback.size === 0 &&
-                this.data === undefined;
+                this._onDescendantsRemoveListenerCallback.size === 0;
 
             if (needClear)
                 this.parent.children.delete(this.name);

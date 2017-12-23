@@ -82,40 +82,6 @@ it('测试属性', function () {
     expect(es.get('d').data).to.be(undefined);
     expect(es.get('d.e').data).to.be(undefined);
     expect(es.get('d.e.f').data).to.be(undefined);
-
-    //测试注册监听监听器变化回调函数
-
-    const root_descendantsRemoveListener = (<any>es)._onDescendantsRemoveListenerCallback.values().next().value;
-
-    es.watch('addListener', () => { });
-    es.watch('removeListener', () => { });
-    es.watch('ancestorsAddListener', () => { });
-    es.watch('ancestorsRemoveListener', () => { });
-    es.watch('descendantsAddListener', () => { });
-    es.watch('descendantsRemoveListener', () => { });
-
-    expect((<any>es)._onAddListenerCallback.size).to.be(1);
-    expect((<any>es)._onRemoveListenerCallback.size).to.be(1);
-    expect((<any>es)._onAncestorsAddListenerCallback.size).to.be(1);
-    expect((<any>es)._onAncestorsRemoveListenerCallback.size).to.be(1);
-    expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(1);
-    expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(2);   //构造函数那里还会注册一个
-
-    es.watchOff('addListener');
-    es.watchOff('removeListener');
-    es.watchOff('ancestorsAddListener');
-    es.watchOff('ancestorsRemoveListener');
-    es.watchOff('descendantsAddListener');
-    es.watchOff('descendantsRemoveListener');
-
-    expect((<any>es)._onAddListenerCallback.size).to.be(0);
-    expect((<any>es)._onRemoveListenerCallback.size).to.be(0);
-    expect((<any>es)._onAncestorsAddListenerCallback.size).to.be(0);
-    expect((<any>es)._onAncestorsRemoveListenerCallback.size).to.be(0);
-    expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(0);
-    expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(1);   //确保没有清除构造函数配置的
-
-    expect(root_descendantsRemoveListener).to.be((<any>es)._onDescendantsRemoveListenerCallback.values().next().value);
 });
 
 describe('测试工具方法', function () {
@@ -427,32 +393,105 @@ describe('测试事件监听器', function () {
     });
 });
 
-it('测试监听事件监听器', function () {
-    const result: any[] = [];
+describe('测试监听事件监听器变化', function () {
 
-    es.get('b').watch('addListener', (listener, layer) => result.push(layer.name, 'addListener'));
-    es.get('b').watch('removeListener', (listener, layer) => result.push(layer.name, 'removeListener'));
-    es.get('b').watch('ancestorsAddListener', (listener, layer) => result.push(layer.name, 'ancestorsAddListener'));
-    es.get('b').watch('ancestorsRemoveListener', (listener, layer) => result.push(layer.name, 'ancestorsRemoveListener'));
-    es.get('b').watch('descendantsAddListener', (listener, layer) => result.push(layer.name, 'descendantsAddListener'));
-    es.get('b').watch('descendantsRemoveListener', (listener, layer) => result.push(layer.name, 'descendantsRemoveListener'));
+    describe('测试注册与删除', function () {
 
-    es.get('').on(function () { });
-    es.get('b').on(function () { });
-    es.get('b.c').on(function () { });
-    es.get('d').on(function () { });
+        it('在根上注册', function () {
+            const root_descendantsRemoveListener = (<any>es)._onDescendantsRemoveListenerCallback.values().next().value;
 
-    es.get('').off();
-    es.get('b').off();
-    es.get('b.c').off();
-    es.get('d').off();
+            es.watch('addListener', () => { });
+            es.watch('removeListener', () => { });
+            es.watch('ancestorsAddListener', () => { });
+            es.watch('ancestorsRemoveListener', () => { });
+            es.watch('descendantsAddListener', () => { });
+            es.watch('descendantsRemoveListener', () => { });
 
-    expect(result).to.be.eql([
-        '', 'ancestorsAddListener',
-        'b', 'addListener',
-        'c', 'descendantsAddListener',
-        '', 'ancestorsRemoveListener',
-        'b', 'removeListener',
-        'c', 'descendantsRemoveListener'
-    ]);
+            expect((<any>es)._onAddListenerCallback.size).to.be(1);
+            expect((<any>es)._onRemoveListenerCallback.size).to.be(1);
+            expect((<any>es)._onAncestorsAddListenerCallback.size).to.be(1);
+            expect((<any>es)._onAncestorsRemoveListenerCallback.size).to.be(1);
+            expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(1);
+            expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(2);   //构造函数那里还会注册一个
+
+            es.watchOff('addListener');
+            es.watchOff('removeListener');
+            es.watchOff('ancestorsAddListener');
+            es.watchOff('ancestorsRemoveListener');
+            es.watchOff('descendantsAddListener');
+            es.watchOff('descendantsRemoveListener');
+
+            expect((<any>es)._onAddListenerCallback.size).to.be(0);
+            expect((<any>es)._onRemoveListenerCallback.size).to.be(0);
+            expect((<any>es)._onAncestorsAddListenerCallback.size).to.be(0);
+            expect((<any>es)._onAncestorsRemoveListenerCallback.size).to.be(0);
+            expect((<any>es)._onDescendantsAddListenerCallback.size).to.be(0);
+            expect((<any>es)._onDescendantsRemoveListenerCallback.size).to.be(1);   //确保没有清除构造函数配置的
+
+            expect(root_descendantsRemoveListener).to.be((<any>es)._onDescendantsRemoveListenerCallback.values().next().value);
+        });
+
+        it('在其他层级上注册', function () {
+            const layer = es.get('a');
+
+            layer.watch('addListener', () => { });
+            layer.watch('removeListener', () => { });
+            layer.watch('ancestorsAddListener', () => { });
+            layer.watch('ancestorsRemoveListener', () => { });
+            layer.watch('descendantsAddListener', () => { });
+            layer.watch('descendantsRemoveListener', () => { });
+
+            expect((<any>layer)._onAddListenerCallback.size).to.be(1);
+            expect((<any>layer)._onRemoveListenerCallback.size).to.be(1);
+            expect((<any>layer)._onAncestorsAddListenerCallback.size).to.be(1);
+            expect((<any>layer)._onAncestorsRemoveListenerCallback.size).to.be(1);
+            expect((<any>layer)._onDescendantsAddListenerCallback.size).to.be(1);
+            expect((<any>layer)._onDescendantsRemoveListenerCallback.size).to.be(1);
+
+            layer.watchOff('addListener');
+            layer.watchOff('removeListener');
+            layer.watchOff('ancestorsAddListener');
+            layer.watchOff('ancestorsRemoveListener');
+            layer.watchOff('descendantsAddListener');
+            layer.watchOff('descendantsRemoveListener');
+
+            expect((<any>layer)._onAddListenerCallback.size).to.be(0);
+            expect((<any>layer)._onRemoveListenerCallback.size).to.be(0);
+            expect((<any>layer)._onAncestorsAddListenerCallback.size).to.be(0);
+            expect((<any>layer)._onAncestorsRemoveListenerCallback.size).to.be(0);
+            expect((<any>layer)._onDescendantsAddListenerCallback.size).to.be(0);
+            expect((<any>layer)._onDescendantsRemoveListenerCallback.size).to.be(0);
+        });
+    });
+
+    it('测试监听', function () {
+        const result: any[] = [];
+
+        es.get('b').watch('addListener', (listener, layer) => result.push(layer.name, 'addListener'));
+        es.get('b').watch('removeListener', (listener, layer) => result.push(layer.name, 'removeListener'));
+        es.get('b').watch('ancestorsAddListener', (listener, layer) => result.push(layer.name, 'ancestorsAddListener'));
+        es.get('b').watch('ancestorsRemoveListener', (listener, layer) => result.push(layer.name, 'ancestorsRemoveListener'));
+        es.get('b').watch('descendantsAddListener', (listener, layer) => result.push(layer.name, 'descendantsAddListener'));
+        es.get('b').watch('descendantsRemoveListener', (listener, layer) => result.push(layer.name, 'descendantsRemoveListener'));
+
+        es.get('').on(function () { });
+        es.get('b').on(function () { });
+        es.get('b.c').on(function () { });
+        es.get('d').on(function () { });
+
+        es.get('').off();
+        es.get('b').off();
+        es.get('b.c').off();
+        es.get('d').off();
+
+        expect(result).to.be.eql([
+            '', 'ancestorsAddListener',
+            'b', 'addListener',
+            'c', 'descendantsAddListener',
+            '', 'ancestorsRemoveListener',
+            'b', 'removeListener',
+            'c', 'descendantsRemoveListener'
+        ]);
+    });
 });
+
