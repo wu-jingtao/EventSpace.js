@@ -1,6 +1,6 @@
 {
   "name": "eventspace",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "一个树状的事件派发框架",
   "main": "./bin/EventSpace.js",
   "types": "./bin/EventSpace.d.ts",

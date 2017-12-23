@@ -24,6 +24,14 @@ it('测试属性', function () {
     expect(es.get('d.e').parent).to.be(es.get('d'));
     expect(es.get('d.e.f').parent).to.be(es.get('d.e'));
 
+    //测试 root 属性
+    expect(es.root).to.be(es);
+    expect(es.get('').root).to.be(es);
+    expect(es.get([]).root).to.be(es);
+    expect(es.get('d').root).to.be(es);
+    expect(es.get('d.e').root).to.be(es);
+    expect(es.get('d.e.f').root).to.be(es);
+
     //测试 children 属性
     expect(es.children.size).to.be(1);
     expect(es.children.has('d')).to.be.ok();

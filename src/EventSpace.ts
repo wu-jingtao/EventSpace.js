@@ -80,6 +80,11 @@ export default class EventSpace<T> {
     readonly parent?: EventSpace<T>;
 
     /**
+     * 根
+     */
+    readonly root: EventSpace<T>;
+
+    /**
      * 当前层的名称。根的名称为空字符串    
      * 注意：以数组表示时，空数组才代表根
      */
@@ -135,6 +140,7 @@ export default class EventSpace<T> {
     constructor(parent?: EventSpace<T>, name: string = '') {
         this.parent = parent;
         this.name = name;
+        this.root = parent ? parent.root : this;
 
         //-------- 清理不再被使用的层 ---------
         if (this.parent === undefined && this.name === '') {    //确保是根
