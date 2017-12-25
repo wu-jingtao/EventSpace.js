@@ -475,12 +475,12 @@ describe('测试监听事件监听器变化', function () {
     it('测试监听', function () {
         const result: any[] = [];
 
-        es.get('b').watch('addListener', (listener, layer) => result.push(layer.name, 'addListener'));
-        es.get('b').watch('removeListener', (listener, layer) => result.push(layer.name, 'removeListener'));
-        es.get('b').watch('ancestorsAddListener', (listener, layer) => result.push(layer.name, 'ancestorsAddListener'));
-        es.get('b').watch('ancestorsRemoveListener', (listener, layer) => result.push(layer.name, 'ancestorsRemoveListener'));
-        es.get('b').watch('descendantsAddListener', (listener, layer) => result.push(layer.name, 'descendantsAddListener'));
-        es.get('b').watch('descendantsRemoveListener', (listener, layer) => result.push(layer.name, 'descendantsRemoveListener'));
+        es.get('b').watch('addListener', (listener, layer) => result.push(layer.name, layer.listenerCount, 'addListener'));
+        es.get('b').watch('removeListener', (listener, layer) => result.push(layer.name, layer.listenerCount, 'removeListener'));
+        es.get('b').watch('ancestorsAddListener', (listener, layer) => result.push(layer.name, layer.listenerCount, 'ancestorsAddListener'));
+        es.get('b').watch('ancestorsRemoveListener', (listener, layer) => result.push(layer.name, layer.listenerCount, 'ancestorsRemoveListener'));
+        es.get('b').watch('descendantsAddListener', (listener, layer) => result.push(layer.name, layer.listenerCount, 'descendantsAddListener'));
+        es.get('b').watch('descendantsRemoveListener', (listener, layer) => result.push(layer.name, layer.listenerCount, 'descendantsRemoveListener'));
 
         es.get('').on(function () { });
         es.get('b').on(function () { });
@@ -493,12 +493,12 @@ describe('测试监听事件监听器变化', function () {
         es.get('d').off();
 
         expect(result).to.be.eql([
-            '', 'ancestorsAddListener',
-            'b', 'addListener',
-            'c', 'descendantsAddListener',
-            '', 'ancestorsRemoveListener',
-            'b', 'removeListener',
-            'c', 'descendantsRemoveListener'
+            '', 1, 'ancestorsAddListener',
+            'b', 1, 'addListener',
+            'c', 1, 'descendantsAddListener',
+            '', 0, 'ancestorsRemoveListener',
+            'b', 0, 'removeListener',
+            'c', 0, 'descendantsRemoveListener'
         ]);
     });
 });
