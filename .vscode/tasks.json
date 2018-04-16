@@ -4,11 +4,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "编译",
+            "label": "编译",
             "command": "npm run compile"
         },
         {
-            "taskName": "测试",
+            "label": "测试",
             "command": "npm run test"
         }
     ]
