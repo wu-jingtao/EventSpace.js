@@ -6,7 +6,7 @@
   "types": "./bin/EventSpace.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mx601595686/EventSpace.js.git"
+    "url": "git+https://github.com/wu-jingtao/EventSpace.js.git"
   },
   "keywords": [
     "event",
@@ -17,9 +17,9 @@
   "author": "wujingtao",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mx601595686/EventSpace.js/issues"
+    "url": "https://github.com/wu-jingtao/EventSpace.js/issues"
   },
-  "homepage": "https://github.com/mx601595686/EventSpace.js#readme",
+  "homepage": "https://github.com/wu-jingtao/EventSpace.js#readme",
   "scripts": {
     "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register",
     "compile": "gulp compile"
